@@ -1,0 +1,54 @@
+﻿<div class="row">
+    <div class="col-sm-6">
+        <div>
+            <input name="k" class="form-control input-lg search-field" type="text" placeholder="By Title or Content" ng-model="params.title">
+        </div>
+        <div class="advanced-search-options hidden-xs">
+            <input name="k" class="form-control input-lg search-field" type="text" token-input data-url="/api/Users/Search" data-query-param="username" data-hint-text="Start typing username and select" data-placeholder="By Collaborators" ng-model="params.collaborators">
+        </div>
+        <div class="advanced-search-options hidden-xs">
+            <input name="k" class="form-control input-lg search-field" token-input data-url="/api/Tags/Search" data-placeholder="By Tag" data-query-param="name" data-min-chars="2" data-max-chars="30" data-hint-text="Start typing tag name and select" type="text" placeholder="By Tags" ng-model="params.tags">
+        </div>
+    </div>
+    <div class="col-sm-6 hidden-xs advanced-search-options">
+        <div class="row">
+            <div class="col-sm-12">
+                <select class="selectpicker picker-button form-control margin-bottom-10" name="season" id="seasons"
+                        ng-model="params.season"
+                        ng-options="season.name for season in seasons track by season.id" ng-change="search()">
+                    <option value="">By Season</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <select class="selectpicker form-control margin-bottom-10 picker-button" ng-model="params.languagesAndTechnologies" multiple title="By Languages or Technology" data-max-options="10" data-live-search="true" data-selected-text-format="count>5">
+                    <optgroup label="Languages">
+                        <option ng-repeat="language in languages" value="{{language.id}}">{{language.name}}</option>
+                    </optgroup>
+                    <optgroup label="Technologies">
+                        <option ng-repeat="technology in technologies" value="{{technology.id}}">{{technology.name}}</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 ">
+                <p class="input-group date-picker">
+                    <input type="text" placeholder="From" class="form-control search-field" datepicker-options="{{options}}" datepicker-popup="dd-MMM-yyyy" ng-model="params.fromDate" is-open="fromDateIsOpen" close-text="Close" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default search-page-date-button" ng-click="openFrom($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+            <div class="col-sm-6 ">
+                <p class="input-group date-picker">
+                    <input type="text" placeholder="To" class="form-control search-field" datepicker-popup="dd-MMM-yyyy" ng-model="params.toDate" is-open="toDateIsOpen" close-text="Close" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default search-page-date-button" ng-click="openTo($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

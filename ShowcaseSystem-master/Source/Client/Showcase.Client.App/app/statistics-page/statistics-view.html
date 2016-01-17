@@ -1,0 +1,36 @@
+﻿<section class="nopadding-top">
+    <div class="container" animate="fadeIn">
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10">
+                <div statistics stats="vm.mainStatistics" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10">
+                <div class="row text-center">
+                    <div class="col-md-6 margin-top-30">
+                        <h3 class="color999"><strong>Projects Last 6</strong> Months</h3>
+                        <div line-chart stats="vm.projectsByMonth" data-plugin-options='{"label":"Projects By Month", "fillColor": "rgba(153,204,51,0.4)", "strokeColor": "rgba(153,204,51,1)", "pointColor": "rgba(153,204,51,1)", "pointStrokeColor": "#fff", "pointHighlightFill": "#fff", "pointHighlightStroke": "rgba(220,220,220,1)"}' />
+                    </div>
+                    <div class="col-md-6 margin-top-30">
+                        <h3 class="color999"><strong>Top 6</strong> Tags</h3>
+                        <div pie-chart stats="vm.projectsByTag" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row margin-bottom-50">
+            <div class="col-md-offset-1 col-md-5  margin-top-70">
+                <h3 class="text-center color999"><strong>Top 50</strong> Users</h3>
+                <div statistics-users users="vm.topUsers" />
+            </div>
+            <div class="col-md-5 margin-top-70">
+                <h3 class="text-center color999"><strong>Top 50</strong> Projects</h3>
+                <div statistics-projects projects="vm.mostLiked" />
+            </div>
+        </div>
+        <div class="row text-center">
+            <small class="note"><strong>Note:</strong> statistics are updated every 15 minutes</small>
+        </div>
+    </div>
+</section>

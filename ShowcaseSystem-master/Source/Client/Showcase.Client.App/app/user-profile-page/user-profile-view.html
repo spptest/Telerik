@@ -1,0 +1,70 @@
+﻿<section>
+    <div class="container">
+        <div class="row margin-bottom-50">
+            <div class="col-md-offset-1 col-md-3 text-center-small" animate="fadeInLeft" data-animation-delay="200">
+                <img ng-src="{{vm.profile.profileAvatarUrl}}" width="220" height="220" alt="{{vm.user.username}}" />
+                <h3 class="margin-top-20 color666 font-size-14em text-center" style="width: 220px;"><strong>{{vm.user.username}}</strong></h3>
+            </div>
+            <div class="col-md-7 margin-bottom-10 margin-top-10 text-center-small" animate="fadeInRight" data-animation-delay="200">
+                <div class="font-size-14em margin-bottom-20" style="padding-left: 12px;">
+                    <i class="margin-right-10" ng-class="vm.profile.sex == 'Male' ? 'fa fa-male' : 'fa fa-female'"></i>{{vm.profile.firstName}} {{vm.profile.lastName}}
+                </div>
+                <div class="row">
+                    <div class="col-md-6 margin-bottom-30">
+                        <div class="well well-sm">
+                            <div>
+                                <i class="fa fa-birthday-cake margin-right-10"></i>{{vm.profile.age}} years old
+                            </div>
+                            <div>
+                                <i class="fa fa-globe margin-right-10"></i>{{vm.profile.city}}
+                            </div>
+                            <div>
+                                <i class="fa fa-link margin-right-10"></i><a href="http://www.telerikacademy.com/users/{{vm.user.username}}" target="_blank">Website</a>
+                            </div>
+                            <div>
+                                <i class="fa fa-link margin-right-10"></i><a href="http://www.telerikacademy.com/users/{{vm.user.username}}" target="_blank">Student profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div user-profile-statistics user="vm.user" class="well well-sm"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row margin-top-50">
+            <div class="col-md-offset-1 col-md-10" animate="fadeInUp" data-animation-delay="200">
+                <div class="tabs nomargin-top">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <h4><a class="tab-button" href="#projects-tab" data-toggle="tab"><i class="fa fa-file-code-o"></i>Projects</a></h4>
+                        </li>
+                        <li>
+                            <h4><a class="tab-button" href="#comments-tab" data-toggle="tab"><i class="fa fa-comments"></i>Comments</a></h4>
+                        </li>
+                        <li>
+                            <h4><a class="tab-button" href="#collaborators-tab" data-toggle="tab"><i class="fa fa-users"></i>Collaborators</a></h4>
+                        </li>
+                        <li ng-show="vm.isAdmin || vm.user.username.toLowerCase() == vm.currentlyLoggedUser">
+                            <h4><a class="tab-button" href="#liked-projects-tab" data-toggle="tab"><i class="fa fa-thumbs-up"></i>Liked Projects</a></h4>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="projects-tab" class="tab-pane active">
+                            <div user-profile-projects projects="vm.user.projects" />
+                        </div>
+                        <div id="comments-tab" class="tab-pane padding-top-30">
+                            <div user-profile-comments comments="vm.comments" />
+                        </div>
+                        <div id="collaborators-tab" class="tab-pane padding-top-30">
+                            <div user-profile-collaborators collaborators="vm.user.collaborators" />
+                        </div>
+                        <div id="liked-projects-tab" ng-show="vm.isAdmin || vm.user.username.toLowerCase() == vm.currentlyLoggedUser" class="tab-pane">
+                            <div user-profile-projects projects="vm.likedProjects" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<!--[if IE 8]>			<html class="ie ie8"> <![endif]-->
+<!--[if IE 9]>			<html class="ie ie9"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html>
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>Telerik Academy Showcase System</title>
+    <meta name="keywords" content="Telerik Academy Showcase System" />
+    <meta name="Author" content="Telerik Academy" />
+
+    <meta name="title" content="Telerik Academy Showcase System" />
+    <meta name="description" content="Showcase system for students' projects in Telerik Academy" />
+    <meta property="og:title" content="Telerik Academy Showcase System" />
+    <meta property="og:description" content="Showcase system for students' projects in Telerik Academy" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Telerik Academy Showcase System" />
+    <meta property="og:image:url" content="http://best.telerikacademy.com/content/images/telerik-logo.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="371" />
+    <meta property="og:image:height" content="373" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0" />
+
+    <base href="/">
+
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,800&amp;subset=latin,latin-ext,cyrillic,cyrillic-ext" rel="stylesheet" type="text/css" />
+    <link href="scripts/epona/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- inject:css -->
+    <!-- endinject -->
+
+    <script type="text/javascript" src="/scripts/epona/plugins/modernizr.min.js"></script>
+
+    <!--[if lte IE 8]>
+        <script src="/scripts/epona/plugins/respond.js"></script>
+    <![endif]-->
+
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-61470412-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+</head>
+<body class="smoothscroll" ng-app="showcaseSystem" ng-cloak ng-controller="MainController as vm">
+    <div id="wrapper">
+        <div id="header" showcase-header animate="fadeIn"></div>
+
+        <div id="content" ng-view></div>
+
+        <footer id="footer" showcase-footer animate="fadeIn"></footer>
+        <a href="#" id="toTop"></a>
+
+        <div ng-include="'identity/login-modal-template.html'"></div>
+    </div>
+
+    <!-- inject:vendors:js -->
+    <!-- endinject -->
+    <!-- inject:js -->
+    <!-- endinject -->
+</body>
+</html>
