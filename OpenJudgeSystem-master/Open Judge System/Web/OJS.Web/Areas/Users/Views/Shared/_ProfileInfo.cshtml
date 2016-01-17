@@ -1,0 +1,102 @@
+﻿@using OJS.Web.Areas.Users.ViewModels
+@using Resource = Resources.Areas.Users.Shared.ProfileProfileInfo;
+
+@model UserProfileViewModel
+
+<div class="container">
+    <h2>
+        @string.Format(Resource.Profile_title, Model.Username)
+        @if (!string.IsNullOrEmpty(Model.FirstName) || !string.IsNullOrEmpty(Model.LastName))
+        {
+            <text>(@Model.FirstName @Model.LastName)</text>
+        }
+    </h2>
+
+    @if (User.IsAdmin())
+    {
+        <div class="col-md-12">
+            <div class="text-white">
+                <span class="text-primary">Id: </span>
+                @Model.Id
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="text-white">
+                <span class="text-primary">E-mail: </span>
+                @Model.Email
+            </div>
+        </div>
+    }
+
+    <div class="col-md-6">
+        @if (Model.Age != null)
+        {
+            <div class="text-white">
+                <span class="text-primary">@Resource.Age: </span>
+                @Model.Age
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.City))
+        {
+            <div class="text-white">
+                <span class="text-primary">@Resource.City: </span>
+                @Model.City
+            </div>
+        }
+    </div>
+    @if (User.Identity.Name == Model.Username)
+    {
+        <div class="col-md-offset-4 col-md-2">
+            <a href="Settings/" class="btn btn-primary pull-right">@Resource.Settings</a>
+        </div>
+    }
+</div>
+<br />
+
+@if (User.IsAdmin() || User.Identity.Name == Model.Username)
+{
+    <div class="col-md-12">
+        <h2>Решения</h2>
+        @{Html.RenderPartial("_AdvancedSubmissionsGridPartial", Model.Id);}
+    </div>
+    <br />
+}
+
+<div class="col-md-12">
+    <h2>@Resource.Participations</h2>
+    <table class="table table-responsive table-striped">
+        <thead class="text-white">
+            <tr>
+                <th>
+                    @Resource.Contest
+                </th>
+                @if (User.Identity.Name == Model.Username || User.IsAdmin())
+                {
+                    <th>@Resource.Results</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model.Participations)
+            {
+                <tr>
+                    <td>
+                        <a href="@ContestsHelper.GetUrl(result.ContestId, result.ContestName)">
+                            @result.ContestName
+                        </a>
+                    </td>
+
+                    @if (User.Identity.Name == Model.Username || User.IsAdmin())
+                    {
+                        <td>
+                            @Resource.Compete: <span class="text-white">@result.CompeteResult / @result.ContestMaximumPoints.GetValueOrDefault()</span>
+                            <br />
+                            @Resource.Practice: <span class="text-white">@result.PracticeResult / @result.ContestMaximumPoints.GetValueOrDefault()</span>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

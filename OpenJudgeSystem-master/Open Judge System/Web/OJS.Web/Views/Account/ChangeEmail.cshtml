@@ -1,0 +1,66 @@
+﻿@model OJS.Web.ViewModels.Account.ChangeEmailViewModel
+
+@{
+    ViewBag.Title = Resources.Account.Views.ChangeEmailView.Title;
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">Начало</a></li>
+    <li>@Html.ActionLink("Профил", GlobalConstants.Index, new { controller = "Profile", area = "Users" })</li>
+    <li>@Html.ActionLink("Настройки", GlobalConstants.Index, new { controller = "Settings", area = "Users" })</li>
+    <li class="active">@ViewBag.Title</li>
+</ol>
+
+<h3>@ViewBag.Title</h3>
+
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="row">
+            <div class="col-xs-4 text-right">
+                @Html.LabelFor(m => m.Password, new { @class = "text-primary loud" })
+            </div>
+            <div class="col-xs-7">
+                @Html.EditorFor(m => m.Password)
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-4 text-right">
+                @Html.LabelFor(m => m.Email, new { @class = "text-primary loud" })
+            </div>
+            <div class="col-xs-7">
+                @Html.EditorFor(m => m.Email)
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-4 text-right">
+                @Html.LabelFor(m => m.EmailConfirmation, new { @class = "text-primary loud" })
+            </div>
+            <div class="col-xs-7">
+                @Html.EditorFor(m => m.EmailConfirmation)
+                @Html.ValidationMessageFor(m => m.EmailConfirmation)
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-xs-4 text-right">
+                @Html.ActionLink(
+                Resources.Account.Views.ChangeEmailView.Cancel,
+                GlobalConstants.Index,
+                new { controller = "Settings", area = "Users" },
+                new { @class = "btn btn-primary" })
+            </div>
+            <div class="col-md-7 text-left">
+                <button class="btn btn-success" type="submit">@Resources.Account.Views.ChangeEmailView.Save</button>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

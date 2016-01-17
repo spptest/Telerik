@@ -1,0 +1,28 @@
+﻿@using Resource = Resources.Account.Views.Manage
+
+@{
+    ViewBag.Title = Resource.Change_password;
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">Начало</a></li>
+    <li>@Html.ActionLink("Профил", GlobalConstants.Index, new { controller = "Profile", area = "Users"})</li>
+    <li>@Html.ActionLink("Настройки", GlobalConstants.Index, new { controller = "Settings", area = "Users" })</li>
+    <li class="active">@ViewBag.Title</li>
+</ol>
+
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-12">
+        @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
+
+        <section id="externalLogins">
+            @Html.Action("RemoveAccountList")
+            @*@Html.Partial("_ExternalLoginsListPartial", new { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })*@
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

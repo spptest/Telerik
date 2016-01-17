@@ -1,0 +1,74 @@
+﻿@model OJS.Web.ViewModels.Account.RegisterViewModel
+@using Resource = Resources.Account.Views.Register
+
+@{
+    ViewBag.Title = Resource.Register_title;
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">Начало</a></li>
+    <li class="active">@ViewBag.Title</li>
+</ol>
+
+<div class="row">
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+        <div class="col-md-5">
+            <h4>@ViewBag.Title</h4>
+            <hr />
+            <div class="form-group">
+                <div class="pull-left col-sm-4 col-xs-12">
+                    @Html.LabelFor(m => m.UserName)
+                </div>
+                <div class="pull-right col-sm-8 col-xs-12">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="pull-left col-sm-4 col-xs-12">
+                    @Html.LabelFor(m => m.Password, new { @class = "" })
+                </div>
+                <div class="pull-right col-sm-8 col-xs-12">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="pull-left col-sm-4 col-xs-12">
+                    @Html.LabelFor(m => m.ConfirmPassword)
+                </div>
+                <div class="pull-right col-sm-8 col-xs-12">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="pull-left col-sm-4 col-xs-12">
+                    @Html.LabelFor(m => m.Email)
+                </div>
+                <div class="pull-right col-sm-8 col-xs-12">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="captcha-container editor-field pull-right small-margin-top">
+                @Html.Raw(Html.GenerateCaptcha())
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group">
+                <div class="col-md-offset-10">
+                    <input type="submit" class="btn btn-default small-margin-top" value="@Resource.Register_button" />
+                </div>
+            </div>
+        </div>
+    }
+    <div class="col-md-offset-1 col-md-4">
+        <section id="socialLoginForm">
+            @Html.Partial("_ExternalLoginsListPartial", new { Action = "ExternalLogin", ViewBag.ReturnUrl })
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,16 @@
+﻿@using Resource = Resources.Areas.Administration.Participants.Views.ParticipantsContest;
+@model int
+@{
+    ViewBag.Title = Resource.Page_title;
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" id="participants-grid">
+            @Html.Partial("_Participants", Model)
+        </div>
+    </div>
+</div>
+

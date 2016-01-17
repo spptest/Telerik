@@ -1,0 +1,128 @@
+﻿@model OJS.Web.Areas.Contests.ViewModels.Participants.ParticipantViewModel
+
+@using Resource = Resources.Areas.Contests.Views.CompeteIndex;
+@using ContestResource = Resources.Areas.Contests.Views.ContestsDetails;
+
+@{
+    ViewBag.Title = Model.Contest.Name;
+}
+
+@section styles {
+    @Styles.Render("~/Content/CodeMirror/codemirror", "~/Content/Contests/submission-page")
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">@ContestResource.Home</a></li>
+    <li>@Html.ActionLink(ContestResource.Contests, GlobalConstants.Index, "List")</li>
+    <li><a href="/Contests#!/List/ByCategory/@Model.Contest.CategoryId/@Model.Contest.CategoryName">@Model.Contest.CategoryName</a></li>
+    <li class="active">@Model.Contest.Name</li>
+</ol>
+
+<h1>
+    <a href="@ContestsHelper.GetUrl(Model.Contest.Id, Model.Contest.Name)">@Model.Contest.Name</a>
+</h1>
+
+@{
+    var contestIsCompete = Model.ContestIsCompete && Model.Contest.EndTime.HasValue && Model.Contest.EndTime.Value > DateTime.Now;
+    var contestIsPractice = !Model.ContestIsCompete && Model.Contest.PracticeEndTime.HasValue && Model.Contest.PracticeEndTime > DateTime.Now;
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>@Resource.Submit_solution</h2>
+    </div>
+    <div class="col-md-4 text-right" id="countdown-timer-container">
+        @if (contestIsPractice)
+        {
+            <div>@Resource.Practice_end_time: @Model.Contest.PracticeEndTime.Value.ToString("hh:mm d.M.yyy")</div>
+        }
+        <div class="clearfix"></div>
+        <div class="pull-right"><a href="@(string.Format("/Contests/{0}/Results/Simple/{1}", ViewBag.CompeteType, Model.Contest.Id))">@Resource.Results</a></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        @(Html.Kendo().TabStrip()
+            .Name("SubmissionsTabStrip")
+            .Items(tabstrip =>
+            {
+                foreach (var problem in Model.Contest.Problems)
+                {
+                    tabstrip.Add()
+                        .Text(problem.Name)
+                        .LoadContentFrom(Url.Action("Problem", new { id = problem.ProblemId, controller = ViewBag.CompeteType }));
+                }
+
+                if (!Model.Contest.Problems.Any())
+                {
+                    tabstrip.Add().Text(Resource.No_tasks).Content(Resource.No_tasks_added_yet);
+                }
+                
+                if (User.IsAdmin())
+                {
+                    tabstrip.Add().Text(Resource.Add_task).Action("Create", "Problems", new { Area = "Administration", Model.Contest.Id }).HtmlAttributes(new { target = "_blank" });
+                }
+            })
+            .Events(ev =>
+            {
+                ev.ContentLoad("tabStripManager.onContentLoad");
+                ev.Activate("tabStripManager.tabSelected");
+            })
+        )
+    </div>
+</div>
+
+@{
+    string remainingTimeFormat = string.Format("\"<div id='countdown-timer'>" + Resource.Remaining_time_format + "</div>\"", "<span id='hours-remaining'></span>",
+        "<span id='minutes-remaining'></span>", "<span id='seconds-remaining'></span>");
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/codemirror")
+    <script src="/Scripts/Helpers/test-results.js"></script>
+    <script src="/Scripts/Countdown/countdown.min.js"></script>
+    <script src="/Scripts/Contests/submission-page.js"></script>
+    <script type="text/javascript">
+        var timeValidator = new submissionTimeValidator();
+
+        var validateSubmit = (function () {
+            var submitTime;
+
+            @if(Model.LastSubmissionTime != null) {
+                <text>
+                    submitTime = new Date(Date.parse("@Model.LastSubmissionTime.Value.ToString("dd MMM yyyy HH:mm:ss")"))
+                </text>
+            };
+
+            var serverTime = new Date(Date.parse("@DateTime.Now.ToString("dd MMM yyyy HH:mm:ss")"));
+
+            var limitBetweenSubmissions = parseInt(@Model.Contest.LimitBetweenSubmissions);
+
+            function validateSubmit() {
+                var validationResult = validateSubmissionContent() && timeValidator.validate(submitTime, limitBetweenSubmissions, serverTime);
+                return validationResult;
+            }
+
+            function validateBinarySubmit(fileInput, size, extensions) {
+                var validationResult = validateBinaryFileExists(fileInput)
+                                        && validateBinaryFileSize(fileInput, size)
+                                        && validateBinaryFileAllowedExtensions(fileInput, extensions)
+                                        && timeValidator.validate(submitTime, limitBetweenSubmissions, serverTime);
+                return validationResult;
+            }
+
+            return {
+                content: validateSubmit,
+                binary : validateBinarySubmit
+            };
+        })();
+
+        @if (contestIsCompete)
+        {
+            <text>
+                calculateRemainingTimeOnClient('countdown-timer-container', @Html.Raw(remainingTimeFormat), @Model.Contest.RemainingTimeInMilliseconds.Value);
+            </text>
+        }
+    </script>
+}

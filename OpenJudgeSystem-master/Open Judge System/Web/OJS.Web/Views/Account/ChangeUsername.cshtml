@@ -1,0 +1,38 @@
+﻿@model OJS.Web.ViewModels.Account.ChangeUsernameViewModel
+
+@{
+    ViewBag.Title = "Change username";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary()
+            <div class="form-group row">
+                @Html.LabelFor(m => m.Username, new { @class = "col-md-6 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(m => m.UsernameConfirmation, new { @class = "col-md-6 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.UsernameConfirmation, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="submit" class="btn btn-default pull-right" value="@Resources.Account.Views.ChangeUsernameView.Update" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,17 @@
+﻿@using Resource = Resources.Areas.Administration.Contests.Views.EditorTemplates.CategoryDropDown;
+@model int?
+
+@(Html.Kendo()
+    .DropDownListFor(m => m)
+    .OptionLabel(Resource.Choose_category)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .DataSource(data =>
+        {
+            data.ServerFiltering(true)
+                .Read(read =>
+                    {
+                        read.Action("GetCategories", "Contests");
+                    });
+        })
+    .HtmlAttributes(new { style = "width: 100%;" }))

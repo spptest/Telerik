@@ -1,0 +1,174 @@
+﻿@using OJS.Web.ViewModels
+@using Resource = Resources.Views.Shared.Layout;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - BGCoder.com</title>
+    <meta name="description" content="Online system for programming competitions" />
+    @Styles.Render("~/Content/bootstrap/bootstrap", "~/Content/KendoUI/kendo", "~/Content/css")
+    @RenderSection("styles", required: false)
+    @Scripts.Render("~/bundles/jquery", "~/bundles/kendo", "~/bundles/global")
+</head>
+<body>
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments);
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-27957494-1', 'bgcoder.com');
+        ga('send', 'pageview');
+    </script>
+
+    <!-- Facebook -->
+    <div id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            var js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=140725269459425";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <!-- Header -->
+    <div class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="navbar-brand">BGCoder.com</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">@Resource.Home</a></li>
+                    <li class="dropdown">
+                        <a href="/Contests" class="dropdown-toggle" data-toggle="dropdown">
+                            @Resource.Contests
+                            <strong class="caret"></strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            @foreach (CategoryMenuItemViewModel category in ViewBag.MainCategories)
+                            {
+                                <li><a href="@string.Format("/Contests/#!/List/ByCategory/{0}/{1}", category.Id, category.NameUrl)">@category.Name</a></li>
+                            }
+                            <li class="divider"></li>
+                            <li><a href="/Contests">@Resource.All</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/Submissions">@Resource.Submissions</a></li>
+                    <li><a href="/Feedback">@Resource.Feedback</a></li>
+                    @if (User.IsAdmin())
+                    {
+                        <li class="dropdown">
+                            <a href="/Administration/Navigation" class="dropdown-toggle" data-toggle="dropdown">
+                                @Resource.Administration
+                                <strong class="caret"></strong>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">@Resource.Contests</li>
+                                <li>@Html.ActionLink(Resource.Contests, GlobalConstants.Index, "Contests", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Categories, GlobalConstants.Index, "ContestCategories", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Category_hierarchy, "Hierarchy", "ContestCategories", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Participants, GlobalConstants.Index, "Participants", new { area = "Administration" }, null)</li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">@Resource.Problems</li>
+                                <li>@Html.ActionLink(Resource.Problems, GlobalConstants.Index, "Problems", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Test_files, GlobalConstants.Index, "Tests", new { area = "Administration" }, null)</li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">@Resource.Users</li>
+                                <li>@Html.ActionLink(Resource.Users, GlobalConstants.Index, "Users", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Submissions, GlobalConstants.Index, "Submissions", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Roles, GlobalConstants.Index, "Roles", new { area = "Administration" }, null)</li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">@Resource.Other</li>
+                                <li>@Html.ActionLink(Resource.News, GlobalConstants.Index, "News", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Feedback, GlobalConstants.Index, "Feedback", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Checkers, GlobalConstants.Index, "Checkers", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.SubmissionTypes, GlobalConstants.Index, "SubmissionTypes", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.Settings, GlobalConstants.Index, "Settings", new { area = "Administration" }, null)</li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Anti-cheat</li>
+                                <li>@Html.ActionLink(Resource.IpUsage, "ByIP", "AntiCheat", new { area = "Administration" }, null)</li>
+                                <li>@Html.ActionLink(Resource.SubmissionSimilarity, "BySubmissionSimilarity", "AntiCheat", new { area = "Administration" }, null)</li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Debugging</li>
+                                <li><a href="/Glimpse.axd">Glimpse</a></li>
+                                <li class="divider"></li>
+                                <li>@Html.ActionLink(Resource.All_administrations, GlobalConstants.Index, "Navigation", new { area = "Administration" }, null)</li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+                @Html.Partial("_LoginPartial")
+                <div class="col-md-3 hidden-sm navbar-left search-form">
+                    <form class="navbar-form" role="search" action="/Search/Results">
+                        <div class="input-group">
+                            <input type="text" class="form-control search-box" placeholder=@Resource.Search name="searchTerm" id="searchTerm">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default btn-search" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-1 hidden-lg hidden-md hidden-xs btn btn-search-small navbar-left">
+                    <a href="/Search/" class="btn btn-default btn-search"><i class="glyphicon glyphicon-search"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container">
+        @if (ViewBag.SystemMessages != null)
+        {
+            foreach (var message in (SystemMessageCollection)ViewBag.SystemMessages)
+            {
+                string messageClass = "alert alert-success";
+                switch (message.Type)
+                {
+                    case SystemMessageType.Informational:
+                        messageClass = "alert alert-info";
+                        break;
+                    case SystemMessageType.Success:
+                        messageClass = "alert alert-success";
+                        break;
+                    case SystemMessageType.Warning:
+                        messageClass = "alert alert-warning";
+                        break;
+                    case SystemMessageType.Error:
+                        messageClass = "alert alert-danger";
+                        break;
+                }
+
+                @:<div class="@messageClass"><strong>@Html.Raw(message.Content)</strong></div>
+        }
+        }
+
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2011-@DateTime.Now.Year - @Global.SystemName @Global.SystemVersion - running on Windows. <a href="https://github.com/NikolayIT/OpenJudgeSystem" target="_blank">@Resource.Open_source_project</a></p>
+        </footer>
+    </div>
+
+    <!-- Cookie usage notification -->
+    <div id="cookies-notification">
+        @Html.Raw(Resource.Cookies_notification)
+        <a id="cookies-notification-button" href="#">@Resource.Cookies_notification_OK</a>
+    </div>
+
+    <!-- JavaScripts -->
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

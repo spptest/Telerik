@@ -1,0 +1,305 @@
+﻿@using OJS.Web.Areas.Contests.ViewModels.Contests
+@using OJS.Web.Areas.Contests.ViewModels.Submissions
+@using OJS.Web.Areas.Contests.ViewModels.Results
+@using OJS.Common.Models;
+@using Resource = Resources.Areas.Contests.Shared.ContestsProblemPartial
+
+@model ContestProblemViewModel
+
+<h2>@Model.Name</h2>
+
+<div class="row">
+    @if (User.IsAdmin())
+    {
+        <div class="col-md-12">
+            @Html.ActionLink(Resource.Participants_admin_button, "Contest", "Participants", new { Area = "Administration", Id = Model.ContestId }, new { @class = "btn btn-sm btn-primary" })
+            @Html.ActionLink(Resource.Tests_admin_button, "Problem", "Tests", new { Area = "Administration", Id = Model.ProblemId }, new { @class = "btn btn-sm btn-primary" })
+            @Html.ActionLink(Resource.Change_admin_button, "Edit", "Problems", new { Area = "Administration", Id = Model.ProblemId }, new { @class = "btn btn-sm btn-primary" })
+            @Html.ActionLink(Resource.Delete_admin_button, "Delete", "Problems", new { Area = "Administration", Id = Model.ProblemId }, new { @class = "btn btn-sm btn-primary" })
+        </div>
+    }
+    <div class="col-md-12">
+        <div id="notify-container-@(Model.ProblemId)">
+        </div>
+    </div>
+</div>
+
+@{
+    var className = Model.ShowResults ? "col-lg-8" : "col-lg-12";
+}
+
+<div class="row">
+    <div class="@className">
+        <div class="materials">
+            @foreach (var resource in Model.Resources)
+            {
+                var resourceLink = resource.ProblemType == ProblemResourceType.Video ? resource.Link : Url.Action("DownloadResource", new { controller = ViewBag.CompeteType, id = resource.ResourceId });
+
+                if (resource.ProblemType == ProblemResourceType.ProblemDescription)
+                {
+                    <span class="glyphicon glyphicon-list-alt resource-glyph"></span>
+                }
+                else if (resource.ProblemType == ProblemResourceType.AuthorsSolution)
+                {
+                    <span class="glyphicon glyphicon-thumbs-up resource-glyph"></span>
+                }
+                else if (resource.ProblemType == ProblemResourceType.Video)
+                {
+                    <span class="glyphicon glyphicon-facetime-video resource-glyph"></span>
+                }
+                else
+                {
+                    <span class="glyphicon glyphicon-question-sign"></span>
+                }
+                <a href="@resourceLink" target="_blank" class="resource-link">@resource.Name</a>
+            }
+
+            @if (User.IsInRole("Administrator"))
+            {
+                <a href="/Administration/Problems/Resource/@Model.ProblemId" target="_blank" class="resource-link">Администрация</a>
+            }
+        </div>
+        <div class="submision">
+            @using (Ajax.BeginForm("Submit",
+                new { controller = ViewBag.CompeteType, id = Model.ContestId },
+                new AjaxOptions
+                    {
+                        OnSuccess = "messageNotifier.notifySuccess",
+                        OnFailure = "messageNotifier.notifyFailure",
+                        OnBegin = "validateSubmit.content"
+                    },
+                new { id = "problem_" + Model.ProblemId }))
+            {
+                @Html.HiddenFor(x => x.ProblemId)
+                <div id="submisionDataFields">
+                    <div id="SourceCodeInputFields_@Model.ProblemId">
+                        <textarea class="code-for-problem" id="code-problem-@Model.ProblemId" name="Content"></textarea>
+                    </div>
+                    <div id="FileUploadInputFields_@Model.ProblemId">
+                        @(Html.Kendo().Upload().Name("File").Multiple(false).ShowFileList(true).HtmlAttributes(new { id = "file-problem-" + Model.ProblemId }))
+                        <div id="FileUploadAllowedFileExtensions_@Model.ProblemId"></div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="pull-left submit-container">
+                        <strong>@Resource.Allowed_working_time:</strong> @string.Format("{0:0.00}", Model.TimeLimit) sec.
+                        <br />
+                        <strong>@Resource.Allowed_memory:</strong> @string.Format("{0:0.00}", Model.MemoryLimit) MB
+                        <br />
+                        @if (Model.FileSizeLimit.HasValue)
+                        {
+                            <strong>Size limit:</strong> @(string.Format("{0:0.00}", Model.FileSizeLimit.Value)) @:KB
+                            <br />
+                        }
+                        
+                        <strong>Checker:</strong> @Model.CheckerName <span class="glyphicon glyphicon-question-sign" id="checkers-tooltip"></span>
+                        @if (!string.IsNullOrWhiteSpace(Model.CheckerDescription))
+                        {
+                            @:(@Model.CheckerDescription)
+                        }
+                    </div>
+                    <div class="submit-container pull-right">
+                        <script>
+                            function onSubmissionTypeChange() {
+                                var index = this.selectedIndex;
+                                var dataItem = this.dataItem(index);
+                                var form = $("#problem_@Model.ProblemId");
+                                var fileUpload = $("#FileUploadInputFields_@Model.ProblemId");
+                                var codeArea = $("#SourceCodeInputFields_@Model.ProblemId");
+                                var fileExtensionsInfo = $("#FileUploadAllowedFileExtensions_@Model.ProblemId");
+                                var fileInput;
+                                initFileInput();
+                                
+                                function submitHandler() {
+                                    var size = parseFloat("@(Model.FileSizeLimit)") * 1024;
+                                    var extensions = dataItem.AllowedFileExtensions.split(',');
+                                    return validateSubmit.binary(fileInput[0], size, extensions);
+                                }
+
+                                function initFileInput() {
+                                    fileInput = $('#file-problem-@Model.ProblemId');
+                                }
+
+                                if (fileInput.data('kendoUpload')) {
+                                    var kendoUpload = fileInput.data('kendoUpload');
+                                    kendoUpload.bind('remove', function () {
+                                        initFileInput();
+                                    });
+
+                                    kendoUpload.bind('select', function () {
+                                        initFileInput();
+                                    });
+                                }
+
+                                if (dataItem.AllowBinaryFilesUpload) {
+                                    form.attr("action", form.attr("action").replace("/Submit/", "/SubmitBinaryFile/") + '?returnProblem=' + getSelectedIndexFromHashtag());
+                                    form.attr("data-ajax", "false");
+                                    form.bind('submit', submitHandler);
+                                    fileUpload.show();
+                                    codeArea.hide();
+                                    fileExtensionsInfo.html("<b>Allowed file extensions:</b> " + dataItem.AllowedFileExtensions);
+                                } else {
+                                    form.attr("action", form.attr("action").replace("/SubmitBinaryFile/", "/Submit/"));
+                                    form.attr("data-ajax", "true");
+                                    form.unbind('submit', submitHandler);
+                                    fileUpload.hide();
+                                    codeArea.show();
+                                }
+                            }
+                        </script>
+                        @(Html.Kendo().DropDownList()
+                              .Name("SubmissionTypeId")
+                              .DataTextField("Text")
+                              .DataValueField("Value")
+                              .Events(ev => ev.Change("onSubmissionTypeChange").DataBound("onSubmissionTypeChange"))
+                              .DataSource(data => data.Read("GetAllowedSubmissionTypes", ViewBag.CompeteType, new { id = Model.ContestId }))
+                              .HtmlAttributes(new { id = "dropdown_" + Model.ProblemId }))
+                        <input type="submit" value="@Resource.Submit" class="k-button submision-submit-button" />
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            }
+        </div>
+    </div>
+
+    @{
+        var participantRowTemplate = "#= ParticipantName === '" + User.Identity.Name + "' ? \"<tr class='success'>\" : \"<tr>\"#" +
+            "<td>#:ParticipantName#</td>" + "<td>#:Result# / #:MaximumPoints#</td></tr>";
+    }
+
+    @if (Model.ShowResults)
+    {
+        <div class="col-lg-4 problem-result-container visible-lg">
+            @(Html.Kendo().Grid<ProblemResultViewModel>()
+                .Name("ContestResults_" + Model.ProblemId)
+                .ToolBar(tool => tool.Template(Resource.Problem_results))
+                .Columns(col =>
+                {
+                    col.Bound(x => x.ParticipantName).Width(100);
+                    col.Bound(x => x.Result).Width(80);
+                })
+                .DataSource(data =>
+                {
+                    data.Ajax()
+                        .Sort(sort =>
+                            {
+                                sort.Add(x => x.Result).Descending();
+                                sort.Add(x => x.ParticipantName).Ascending();
+                            })
+                        .Read("ByProblem", "Results", new { official = ViewBag.IsOfficial, id = Model.ProblemId })
+                        .PageSize(8);
+                })
+                .Filterable(x => x.Enabled(false))
+                .Pageable(x =>
+                {
+                    x.ButtonCount(4);
+                    x.Refresh(true);
+                    x.Info(false);
+                })
+                .ClientRowTemplate(participantRowTemplate)
+                .TableHtmlAttributes(new { @class = "table table-striped table-bordered" })
+                .HtmlAttributes(new { @class = "problem_submit_grid" })
+            )
+        </div>
+    }
+</div>
+
+@{
+    var clientTemplate = "#= IsCalculated ? IsCompiledSuccessfully ? displayTestRuns(TestRuns).concat(" +
+                                    " SubmissionPoints.toString().concat(' / ').concat(MaximumPoints)) : " + "'" + Resource.Compile_time_error + "'" +
+                                            ":" + "'" + Resource.Not_processed + "'" + "#";
+}
+
+@if (Model.ShowResults)
+{
+    <div class="row">
+        <div class="col-md-12">
+            @(Html.Kendo()
+            .Grid<SubmissionResultViewModel>()
+            .Name("Submissions_" + Model.ProblemId)
+            .ToolBar(tool =>
+            {
+                tool.Template(Resource.Submissions);
+            })
+            .DataSource(data =>
+            {
+                data.Ajax()
+                    .Sort(sort => sort.Add("SubmissionDate").Descending())
+                    .Read(read => read.Action("ReadSubmissionResults", ViewBag.CompeteType, new { id = Model.ProblemId }))
+                    .PageSize(10);
+            })
+            .Pageable(page =>
+            {
+                page.Info(false);
+                page.Refresh(true);
+            })
+            .Columns(col =>
+            {
+                col.Bound(model => model.SubmissionPoints).ClientTemplate(clientTemplate);
+                col.Template(@<text></text>)
+                    .Title(Resource.Time_and_memory)
+                    .ClientTemplate("#= IsCalculated && IsCompiledSuccessfully ? displayMaximumValues(MaximumMemoryUsed, MaximumTimeUsed, '"
+                    + Resource.Memory + "','" + Resource.Time + "') : '---' #");
+                col.Bound(model => model.SubmissionDate).Width(300).ClientTemplate("#= kendo.format('{0:HH:mm:ss dd.MM.yyyy}', SubmissionDate) # <a href='/Contests/Submissions/View/#=SubmissionId#' target='_blank' class='view-submission-button btn btn-default pull-right'>" + Resource.Details + "</div>");
+            }).HtmlAttributes(new { @class = "problem_submit_grid" })
+            )
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            @(Html.Kendo()
+            .Grid<SubmissionResultIsCompiledViewModel>()
+            .Name("Submissions_" + Model.ProblemId)
+            .ToolBar(tool =>
+            {
+                tool.Template(Resource.Submissions);
+            })
+            .DataSource(data =>
+            {
+                data.Ajax()
+                    .Sort(sort => sort.Add("SubmissionDate").Descending())
+                    .Read(read => read.Action("ReadSubmissionResultsAreCompiled", ViewBag.CompeteType, new { id = Model.ProblemId }))
+                    .PageSize(10);
+            })
+            .Pageable(page =>
+            {
+                page.Info(false);
+                page.Refresh(true);
+            })
+            .Columns(col =>
+            {
+                col.Bound(model => model.IsCompiledSuccessfully).ClientTemplate("#= IsCalculated ? IsCompiledSuccessfully ? " + "'" + Resource.Compiled_successfully + "'" + " : '" + Resource.Compile_time_error + "' : '" + Resource.Not_processed + "' #");
+                col.Bound(model => model.SubmissionDate).Width(300).ClientTemplate("#= kendo.format('{0:HH:mm:ss dd.MM.yyyy}', SubmissionDate) # <a href='/Contests/Submissions/View/#=Id#' target='_blank' class='view-submission-button btn btn-default pull-right'>" + Resource.Details + "</div>");
+            }).HtmlAttributes(new { @class = "problem_submit_grid" })
+            )
+        </div>
+    </div>
+}
+
+@Html.Kendo().Tooltip().For("#checkers-tooltip").ContentTemplateId("checkers-template").Position(TooltipPosition.Top).Width(700)
+
+<script type="text/x-kendo-template" id="checkers-template">
+    <ul style="list-style-type: none">
+        <li>
+            <strong>@Resource.Checker_types</strong>
+        </li>
+        <li>
+            <strong>Exact</strong> @Resource.Exact_checker_description
+        </li>
+        <li>
+            <strong>Trim</strong> @Resource.Trim_checker_description
+        </li>
+        <li>
+            <strong>Sort</strong> @Resource.Sort_checker_description
+        </li>
+        <li>
+            <strong>Case-insensitive</strong> @Resource.Case_insensitive_checker_description
+        </li>
+        <li>
+            <strong>Precision N</strong> @Resource.Precision_checker_description
+        </li>
+    </ul>
+</script>

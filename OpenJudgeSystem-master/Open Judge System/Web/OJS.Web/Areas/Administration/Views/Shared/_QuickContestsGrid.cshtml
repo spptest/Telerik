@@ -1,0 +1,16 @@
+﻿@using OJS.Web.Areas.Administration.ViewModels.Contest
+@using Resource = Resources.Areas.Administration.Shared.Views.Partials.Partials;
+@model IEnumerable<ShortContestAdministrationViewModel>
+
+@(Html.Kendo()
+        .Grid(Model)
+        .Name("future-grid")
+        .Columns(col =>
+            {
+                col.Bound(m => m.Name);
+                col.Bound(m => m.CategoryName);
+                col.Template(@<text>
+                            <div id="contest_@item.Id" class="btn btn-sm btn-primary" data-id="@item.Id" data-clickable="grid-click">@Resource.Details</div>  
+                            </text>);
+            }
+        ))

@@ -1,0 +1,19 @@
+﻿@using Resource = Resources.Areas.Administration.Submissions.Views.Partials.SubmissionForm;
+@model OJS.Web.Areas.Administration.ViewModels.Submission.SubmissionAdministrationViewModel
+
+@using (Html.BeginForm((string)ViewBag.SubmissionAction, "Submissions", FormMethod.Post, new { id = "SubmissionForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        @Html.EditorForModel()
+    </div>
+    <div class="row">
+        <div class="editor-label col-md-1">
+            <button type="submit" class="btn btn-primary">@Resource.Save</button>
+        </div>
+        <div class="editor-label col-xs-1">
+            <a href="/Administration/Submissions" class="btn btn-primary">@Resource.Back</a>
+        </div>
+    </div>
+}

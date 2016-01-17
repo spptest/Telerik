@@ -1,0 +1,284 @@
+﻿@using Resource = Resources.Areas.Administration.Problems.Views.ProblemsCreate;
+@model OJS.Web.Areas.Administration.ViewModels.Problem.DetailedProblemViewModel
+
+@{
+    ViewBag.Title = Resource.Page_title;
+}
+
+<h2>@ViewBag.Title @Resource.For @Model.ContestName</h2>
+<div id="create-form" class="container">
+    @using (Html.BeginForm("Create", "Problems", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationMessage("Resources")
+
+        @Html.HiddenFor(m => m.ContestName)
+        @Html.HiddenFor(m => m.ContestId)
+
+        <fieldset>
+            <legend>@Resource.General_info</legend>
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.Name)
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control pull-left full-editor" })
+                </div>
+                <div class="editor-field col-xs-4">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_name" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.MaximumPoints)
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    @(Html.Kendo()
+                    .NumericTextBoxFor(m => m.MaximumPoints)
+                    .Min(1)
+                    .Format("#")
+                    .Step(1)
+                    .Spinners(false)
+                    .HtmlAttributes(new { @class = "pull-left full-editor" }))
+                </div>
+                <div class="editor-field col-xs-4">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_max_points" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.MaximumPoints)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.TimeLimit) (в ms)
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    @(Html.Kendo()
+                    .NumericTextBoxFor(m => m.TimeLimit)
+                    .Min(1)
+                    .Format("#")
+                    .Step(1)
+                    .Spinners(false)
+                    .HtmlAttributes(new { @class = "pull-left full-editor" }))
+                </div>
+                <div class="editor-field col-xs-4">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_time_limit" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.TimeLimit)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.MemoryLimit) (в B)
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    @(Html.Kendo()
+                    .NumericTextBoxFor(m => m.MemoryLimit)
+                    .Format("#")
+                    .Min(1)
+                    .Step(1)
+                    .Spinners(false)
+                    .HtmlAttributes(new { @class = "pull-left full-editor" }))
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_memory_limit" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.MemoryLimit)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.SourceCodeSizeLimit) (в B)
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    <input type="checkbox" id="enable-sclimit" />
+                    <strong>Да</strong>
+                    @(Html.Kendo()
+                    .NumericTextBoxFor(m => m.SourceCodeSizeLimit)
+                    .Format("#")
+                    .Min(1)
+                    .Step(1)
+                    .Enable(false)
+                    .Spinners(false)
+                    .HtmlAttributes(new { @class = "pull-right full-editor", style = "width: 75%" }))
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_sorce_code_size_limit" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.SourceCodeSizeLimit)
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>@Resource.Settings</legend>
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.Checker)
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    @(Html.Kendo()
+                    .DropDownListFor(m => m.Checker)
+                    .BindTo(Model.AvailableCheckers)
+                    .HtmlAttributes(new { @class = "pull-left full-kendo-editor" }))
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" id="checkers-tooltip"></span>
+                    @Html.ValidationMessageFor(m => m.Checker)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.OrderBy)
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    @(Html.Kendo()
+                    .NumericTextBoxFor(m => m.OrderBy)
+                    .Format("#")
+                    .Min(0)
+                    .Step(1)
+                    .Spinners(false)
+                    .HtmlAttributes(new { @class = "pull-left full-editor" }))
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_order" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.OrderBy)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.ShowResults)
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    @Html.EditorFor(m => m.ShowResults)
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Show_results" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.ShowResults)
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        @Html.LabelFor(m => m.ShowDetailedFeedback)
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    @Html.EditorFor(m => m.ShowDetailedFeedback)
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Show_detailed_feedback" data-tooltip="true"></span>
+                    @Html.ValidationMessageFor(m => m.ShowDetailedFeedback)
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset>
+            <legend>@Resource.Resources</legend>
+            <div class="row">
+                <div class="container col-md-6">
+                    <div class="pull-right">
+                        <button class="btn btn-primary" id="add-resource">@Resource.Add</button>
+                        <button class="btn btn-primary" id="remove-resource" disabled="disabled">@Resource.Remove</button>
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Add_remove_resource" data-tooltip="true"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="container">
+                    <div class="row" id="resources">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset>
+            <legend>@Resource.Tests</legend>
+            <div class="row">
+                <div class="editor-label col-xs-3">
+                    <div class="pull-right">
+                        <strong>@Resource.Tests_label</strong>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div id="tests-file-button" class="btn btn-sm btn-primary pull-right">@Resource.Choose_file</div>
+                    <div class="hidden-file-upload">
+                        <input type="file" name="testArchive" id="tests-upload-input" />
+                    </div>
+                </div>
+                <div class="editor-field col-xs-3">
+                    <span class="glyphicon glyphicon-question-sign text-primary" id="tests-tooltip"></span>
+                </div>
+            </div>
+            <hr />
+        </fieldset>
+        <br />
+        <div class="row">
+            <div class="editor-label col-xs-5">
+                <button type="submit" id="create-submit" class="btn btn-primary pull-right">@Resource.Create</button>
+            </div>
+            <div class="editor-label col-xs-3">
+                <a href="/Administration/Problems/Contest/@Model.ContestId" class="btn btn-primary">@Resource.Back</a>
+            </div>
+        </div>
+    }
+</div>
+
+@(Html.Kendo().Tooltip().For("#create-form").Filter("[data-tooltip='true']").Position(TooltipPosition.Bottom).Width(240))
+
+<script type="text/x-kendo-template" id="checkers-template">
+    <ul style="list-style-type: none">
+        <li>
+            <strong>@Resource.Choose_code_checker</strong>
+        </li>
+        <li>
+            <strong>Exact</strong> @Resource.Exact_checker_description
+        </li>
+        <li>
+            <strong>Trim</strong> @Resource.Trim_checker_description
+        </li>
+        <li>
+            <strong>Sort</strong> @Resource.Sort_checker_description
+        </li>
+        <li>
+            <strong>Case-insensitive</strong> @Resource.Case_insensitive_checker_description
+        </li>
+        <li>
+            <strong>Precision N</strong> @Resource.Precision_checker_description
+        </li>
+    </ul>
+</script>
+
+<script type="text/x-kendo-template" id="tests-template">
+    @Html.Raw(Resource.Choose_zip_file)
+</script>
+
+@section scripts{
+    <script src="~/Scripts/Administration/Problems/problems-create.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+
+

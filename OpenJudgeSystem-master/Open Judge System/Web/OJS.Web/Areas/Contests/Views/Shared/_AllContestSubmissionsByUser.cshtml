@@ -1,0 +1,63 @@
+﻿@using OJS.Web.Areas.Contests.ViewModels.Contests
+@using OJS.Web.Areas.Contests.ViewModels.Problems
+@using OJS.Web.Areas.Contests.ViewModels.Submissions
+@using Resource = Resources.Areas.Contests;
+
+
+@model ContestViewModel
+
+<script src="/Scripts/Helpers/test-results.js"></script>
+<script src="/Scripts/Contests/submission-page.js"></script>
+
+<h2>@Resource.Shared.ContestsAllContestSubmissionsByUser.User_submission</h2>
+
+@{
+    var clientTemplate = "#= IsCalculated ? " +
+                            "IsCompiledSuccessfully ? " +
+                                "displayTestRuns(TestRuns).concat(" +
+                                    " SubmissionPoints.toString().concat(' / ').concat(MaximumPoints))" +
+                                        " : '" + Resource.Shared.ContestsAllContestSubmissionsByUser.Compile_time_error + "' " +
+                                            ": '" + Resource.Shared.ContestsAllContestSubmissionsByUser.Not_processed + "' #";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @(Html.Kendo()
+            .Grid<SubmissionResultViewModel>()
+            .Name("UserSubmissionsGrid")
+            .Columns(col =>
+            {
+                col.ForeignKey("ProblemId", (IEnumerable<ProblemListItemViewModel>)ViewBag.ContestProblems, "ProblemId", "Name");
+                col.Bound(model => model.SubmissionPoints).ClientTemplate(clientTemplate);
+                col.Template(@<text></text>)
+                    .Title(Resource.ViewModels.SubmissionsViewModels.Time_and_memory)
+                    .ClientTemplate("#= IsCalculated && IsCompiledSuccessfully ? displayMaximumValues(MaximumMemoryUsed, MaximumTimeUsed,"
+                                    + "'" + Resource.Shared.ContestsAllContestSubmissionsByUser.Memory + "','"
+                                    + Resource.Shared.ContestsAllContestSubmissionsByUser.Time + "'" + ") : '---' #");
+                col.Bound(model => model.IsOfficial).ClientTemplate("#: IsOfficial ? '" + Resource.Shared.ContestsAllContestSubmissionsByUser.Compete + "' : '" + Resource.Shared.ContestsAllContestSubmissionsByUser.Practice + "'#");
+                col.Bound(model => model.SubmissionDate).Width(300).ClientTemplate("#= kendo.format('{0:HH:mm:ss dd.MM.yyyy}', SubmissionDate) # <a href='/Contests/Submissions/View/#=SubmissionId#' target='_blank' class='view-submission-button btn btn-default pull-right'>" + Resource.Shared.ContestsAllContestSubmissionsByUser.View + "</div>");
+            })
+            .DataSource(data =>
+            {
+                data.Ajax()
+                    .Sort(sort => sort.Add("SubmissionDate").Descending())
+                    .Read(read => read.Action("UserSubmissions", "Contests", new { contestId = Model.Id }))
+                    .PageSize(10);
+            })
+            .Sortable(sort =>
+            {
+                sort.Enabled(true);
+            })
+            .Filterable(filter =>
+            {
+                filter.Enabled(true);
+            })
+            .Pageable(page =>
+            {
+                page.Info(false);
+                page.Refresh(true);
+            })
+            .HtmlAttributes(new { @class = "problem_submit_grid" })
+        )
+    </div>
+</div>

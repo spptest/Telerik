@@ -1,0 +1,240 @@
+﻿@using OJS.Common.Extensions
+@using OJS.Common.Models
+@using Resource = Resources.Areas.Contests.Views.SubmissionsView;
+
+@model OJS.Web.Areas.Contests.ViewModels.Submissions.SubmissionDetailsViewModel
+
+@{
+    ViewBag.Title = string.Format(Resource.Title, Model.Id, Model.UserName, Model.ProblemName);
+}
+
+@section styles {
+    @Styles.Render("~/Content/CodeMirror/codemirror")
+    @Styles.Render("~/Content/CodeMirror/codemirrormerge")
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/codemirror")
+    @Scripts.Render("~/bundles/codemirrormerge")
+    <script type="text/javascript">
+        $(function () {
+            var textEditor = document.getElementById("code");
+            var editor = new CodeMirror.fromTextArea(textEditor, {
+                mode: "text/x-csharp",
+                lineNumbers: true,
+                matchBrackets: true,
+                theme: "the-matrix",
+                showCursorWhenSelecting: true,
+                undoDepth: 100,
+                lineWrapping: true,
+                readOnly: true,
+                autofocus: false,
+            });
+
+            editor.setSize('100%', '100%');
+        });
+    </script>
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">@Resource.Home</a></li>
+    <li><a href="/Submissions">@Resource.Submissions</a></li>
+    <li class="active">@Model.Id</li>
+</ol>
+
+<h2>@ViewBag.Title</h2>
+<a class="btn btn-sm btn-primary" href="#SourceCode">@Resource.View_code</a>
+@if (User.IsAdmin())
+{
+    <a class="btn btn-sm btn-primary" href="/Administration/Submissions/Update/@Model.Id">@Resource.Update</a>
+    <a class="btn btn-sm btn-primary" href="/Administration/Submissions/Delete/@Model.Id">@Resource.Delete</a>
+    <a class="btn btn-sm btn-primary" href="/Administration/Tests/Problem/@Model.ProblemId">@Resource.Tests</a>
+    <a class="btn btn-sm btn-primary" href="/Users/@Model.UserName">@Resource.Authors_profile</a>
+    <a class="btn btn-sm btn-primary" href="/Administration/Submissions/Retest/@Model.Id">@Resource.Retest</a>
+    <div class="clearfix"></div>
+    if (!string.IsNullOrWhiteSpace(Model.ProcessingComment))
+    {
+        <h2>@Resource.Execution_result:</h2>
+        <pre>@Model.ProcessingComment</pre>
+    }
+}
+<br />
+
+@if (Model.IsDeleted)
+{
+    <div class="alert alert-danger">@Resource.Submission_is_deleted</div>
+}
+
+@if (!Model.Processed)
+{
+    if (Model.Processing)
+    {
+        <div class="alert alert-info">@Resource.Submission_is_processing</div>
+    }
+    else
+    {
+        <div class="alert alert-info">@Resource.Submission_in_queue</div>
+    }
+}
+else
+{
+    if (!Model.IsCompiledSuccessfully)
+    {
+        <div class="alert alert-danger">@Resource.Compile_time_error_occured</div>
+    }
+    else if (!Model.ShowResults) // Inform user that compilation is successful when not showing him all the test runs
+    {
+        <h2 class="text-success">@Resource.Compiled_successfully</h2>
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.CompilerComment))
+    {
+        <h2>@Resource.Compilation_result:</h2>
+        <pre>@Model.CompilerComment</pre>
+    }
+}
+
+@if (Model.Processed && (Model.ShowResults || User.IsAdmin()))
+{
+    foreach (var testResult in Model.TestRuns.OrderByDescending(x => x.IsTrialTest).ThenBy(x => x.Order))
+    {
+        var className = string.Empty;
+        var testResultText = string.Empty;
+        if (testResult.ResultType == TestRunResultType.CorrectAnswer)
+        {
+            className = "text-success";
+            testResultText = Resource.Answer_correct;
+        }
+        else if (testResult.ResultType == TestRunResultType.WrongAnswer)
+        {
+            className = "text-danger";
+            testResultText = Resource.Answer_incorrect;
+        }
+        else if (testResult.ResultType == TestRunResultType.MemoryLimit)
+        {
+            className = "text-danger";
+            testResultText = Resource.Memory_limit;
+        }
+        else if (testResult.ResultType == TestRunResultType.TimeLimit)
+        {
+            className = "text-danger";
+            testResultText = Resource.Time_limit;
+        }
+        else if (testResult.ResultType == TestRunResultType.RunTimeError)
+        {
+            className = "text-danger";
+            testResultText = Resource.Runtime_error;
+        }
+
+        <h3 class="@className">
+            @if (testResult.IsTrialTest)
+            {
+                @:@string.Format("{0}{1}", Resource.Zero_test, testResult.Order)
+            }
+            else
+            {
+                @:@string.Format("{0}{1}", Resource.Test, testResult.Order)
+            }
+            (@testResultText)
+            @if (User.IsAdmin())
+            {
+                <small>@string.Format("{0}{1}", Resource.Run, testResult.Id)</small>
+                <small><a href="/Administration/Tests/Details/@testResult.TestId">@string.Format("{0}{1}", Resource.Test, testResult.TestId)</a></small>
+            }
+        </h3>
+
+        if (testResult.IsTrialTest)
+        {
+            <div>@Resource.Zero_tests_not_included_in_result</div>
+        }
+
+        if (!string.IsNullOrWhiteSpace(testResult.ExecutionComment) && (testResult.IsTrialTest || User.IsAdmin() || Model.ShowDetailedFeedback)) // Temporally execution comments are visible only for administrators
+        {
+            var executionComment = testResult.ExecutionComment;
+            if (!User.IsAdmin() && !Model.ShowDetailedFeedback)
+            {
+                if (Model.SubmissionType.CompilerType == CompilerType.CSharp)
+                {
+                    // The following code will hide the exception message from user when the code is written in C#
+                    var errorParts = executionComment.Split(':');
+                    if (errorParts.Length >= 2)
+                    {
+                        executionComment = errorParts[0] + ":" + errorParts[1];
+                    }
+                    else
+                    {
+                        executionComment = executionComment.MaxLengthWithEllipsis(37);
+                    }
+                }
+                else // Other language
+                {
+                    executionComment = executionComment.MaxLengthWithEllipsis(64);
+                }
+            }
+
+            <pre>@executionComment</pre>
+        }
+
+        if (!string.IsNullOrWhiteSpace(testResult.CheckerComment) ||
+            testResult.ExpectedOutputFragment != null ||
+            testResult.UserOutputFragment != null)
+        {
+            if (testResult.IsTrialTest || User.IsAdmin() || Model.ShowDetailedFeedback)
+            {
+                <div class="diff">
+                    @if (!string.IsNullOrWhiteSpace(testResult.CheckerComment))
+                    {
+                        <pre>@testResult.CheckerComment</pre>
+                    }
+
+                    @if (testResult.ExpectedOutputFragment != null || testResult.UserOutputFragment != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-6 ">Expected output:</div>
+                            <div class="col-md-6">Your output:</div>
+                        </div>
+                        
+                        <div id="diff-@testResult.Id"></div>
+
+                        <script>
+                            $(function () {
+                                var diffContainer = document.getElementById('diff-@testResult.Id');
+                                var mergeView = CodeMirror.MergeView(diffContainer, {
+                                    origLeft: @Html.Raw(Json.Encode(testResult.ExpectedOutputFragment)) || '',
+                                    value: @Html.Raw(Json.Encode(testResult.UserOutputFragment)) || '',
+                                    mode: 'text/x-diff',
+                                    lineNumbers: true,
+                                    lockScroll: true,
+                                    connect: 'align',
+                                    theme: 'the-matrix',
+                                    highlightDifferences: true,
+                                    revertButtons: false,
+                                    allowEditingOriginals: false,
+                                    lineWrapping: true,
+                                    collapseIdentical: false,
+                                    readOnly: true,
+                                    autofocus: false
+                                });
+
+                                mergeView.left.gap.innerText = '';
+                            });
+                        </script>
+                    }
+                </div>
+            }
+        }
+
+        <div>@Resource.Time_used: @string.Format("{0:0.000}", testResult.TimeUsed / 1000.0) s</div>
+        <div>@Resource.Memory_used: @string.Format("{0:0.00}", testResult.MemoryUsed / 1024.0 / 1024.0) MB</div>
+    }
+}
+
+<h3 id="SourceCode">@Resource.Source_code</h3>
+@if (Model.IsBinaryFile)
+{
+    <a class="btn btn-default" href="/Contests/Submissions/Download/@Model.Id">Download binary file</a>
+}
+else
+{
+    <textarea id="code">@Model.ContentAsString</textarea>
+}

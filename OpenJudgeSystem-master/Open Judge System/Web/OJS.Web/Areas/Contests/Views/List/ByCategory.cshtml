@@ -1,0 +1,90 @@
+﻿@model OJS.Web.Areas.Contests.ViewModels.Contests.ContestCategoryViewModel
+
+@using Resource = Resources.Areas.Contests.Views.ListByCategory;
+
+<h3>@Model.CategoryName</h3>
+<div>
+    @if (Model.Contests.Any())
+    {
+        <table class="table table-striped">
+            @foreach (var contest in Model.Contests)
+            {
+                <tr>
+                    <td>
+                        <a href="@ContestsHelper.GetUrl(contest.Id, contest.Name)">@contest.Name</a>
+                    </td>
+                    <td>
+                        @if (contest.CanBeCompeted)
+                        {
+                            @Html.RouteLink(Resource.Compete, "Contests_compete", new { id = contest.Id, action = GlobalConstants.Index }, new { @class = "btn btn-sm btn-success" })
+                            if (contest.HasContestPassword)
+                            {
+                                <div class="glyphicon glyphicon-lock text-white" title="@Resource.Has_compete_password"></div>
+                            }
+                            if (contest.HasContestQuestions)
+                            {
+                                <div class="glyphicon glyphicon-question-sign text-white" title="@Resource.Has_questions_to_be_answered"></div>
+                            }
+                        }
+                        @* TODO: Refactor these checks *@
+                        @if (contest.CanBeCompeted || contest.ResultsArePubliclyVisible || User.IsAdmin())
+                        {
+                            <div class="glyphicon glyphicon-user text-white" title="@Resource.Participant_count"></div> <span>@contest.OfficialParticipants</span>
+                        }
+                        @if (contest.ResultsArePubliclyVisible || User.IsAdmin())
+                        {
+                            <a class="btn btn-sm" href="/Contests/Compete/Results/Simple/@contest.Id">@Resource.Results</a>
+                        }
+                    </td>
+                    <td>
+                        @if (contest.CanBePracticed)
+                        {
+                            @Html.RouteLink(Resource.Practice, "Contests_practice", new { id = contest.Id, action = GlobalConstants.Index }, new { @class = "btn btn-sm btn-primary" })
+                            if (contest.HasPracticePassword)
+                            {
+                                <div class="glyphicon glyphicon-lock text-white" title="@Resource.Has_practice_password"></div>
+                            }
+                            if (contest.HasPracticeQuestions)
+                            {
+                                <div class="glyphicon glyphicon-question-sign text-white" title="@Resource.Has_questions_to_be_answered"></div>
+                            }
+                            <div class="glyphicon glyphicon-user text-white" title="@Resource.Participant_count"></div> <span>@contest.PracticeParticipants</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="glyphicon glyphicon-file text-white" title="@Resource.Problems_count"></div> <span>@contest.ProblemsCount</span>
+                    </td>
+                    @if (User.IsAdmin())
+                    {
+                        <td>
+                            <a href="/Administration/Contests/Edit/@contest.Id"><span class='glyphicon glyphicon-pencil text-primary' title='@Resource.Edit'></span></a>
+                            <a href="/Administration/Problems/Contest/@contest.Id"><span class='glyphicon glyphicon-list text-primary' title='@Resource.Problems'></span></a>
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    }
+    else
+    {
+        if (Model.SubCategories.Count() != 0)
+        {
+            <table class="table table-striped">
+                @foreach (var subCategory in Model.SubCategories)
+                {
+                    string url;
+                    url = string.Format(ViewBag.IsAjax ? "#!/List/ByCategory/{0}/{1}" : "/Contests/List/ByCategory/{0}/{1}", subCategory.Id, subCategory.NameUrl);
+                    <tr>
+                        <td>
+                            <a href="@url" class='subcategory' data-id="@subCategory.Id">@subCategory.Name</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p class="lead text-warning">@Resource.Category_is_empty</p>
+        }
+    }
+</div>

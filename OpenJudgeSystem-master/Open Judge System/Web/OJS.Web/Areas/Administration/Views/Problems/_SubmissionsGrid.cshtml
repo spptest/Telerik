@@ -1,0 +1,31 @@
+﻿@using Resource = Resources.Areas.Administration.Problems.Views.Partials.ProblemsPartials;
+@model int
+
+@{
+    const string ControllerName = "Submissions";
+}
+
+@(Html.Kendo().Grid<OJS.Web.Areas.Administration.ViewModels.Submission.SubmissionAdministrationGridViewModel>()
+    .Name("submissions-grid")
+    .Columns(columns =>
+    {
+        columns.Bound(model => model.ParticipantName);
+        columns.Bound(model => model.ProblemName);
+        columns.Bound(model => model.SubmissionTypeName);
+        columns.Bound(model => model.Status);
+        columns.Bound(model => model.Points);
+        columns.Bound(model => model.CreatedOn).Hidden();
+        columns.Bound(model => model.ModifiedOn).Hidden();
+        columns.Template(@<text></text>).ClientTemplate(string.Format("<a href='{0}/#= Id #' class='k-button k-button-icontext'>{1}</a>", Url.Action("Update", ControllerName), Resource.Edit));
+        columns.Template(@<text></text>).ClientTemplate(string.Format("<a href='{0}/#= Id #' class='k-button k-button-icontext'>{1}</a>", Url.Action("Delete", ControllerName), Resource.Delete));    
+        columns.Template(@<text></text>).ClientTemplate(string.Format("<a href='{0}/#= Id #' class='k-button k-button-icontext' target='_blank'>{1}</a>", Url.Action("Retest", ControllerName), Resource.Retest));
+    })
+    .Pageable(x => x.Refresh(true))
+    .Sortable(x => x.Enabled(true).AllowUnsort(false))
+    .Filterable(x => x.Enabled(true))
+    .DataSource(datasource => datasource
+        .Ajax()
+        .ServerOperation(true)
+        .Sort(sort => sort.Add(x => x.CreatedOn).Descending())
+        .Read(read => read.Action("ReadSubmissions", "Problems", new { id = Model }))
+    ))

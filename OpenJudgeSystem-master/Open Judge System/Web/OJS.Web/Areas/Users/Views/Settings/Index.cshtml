@@ -1,0 +1,157 @@
+﻿@model OJS.Web.Areas.Users.ViewModels.UserSettingsViewModel
+@using Resource = Resources.Areas.Users.Views.Settings.SettingsIndex;
+
+@{
+    ViewBag.Title = Resource.Title;
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">@Resource.Home</a></li>
+    <li>@Html.ActionLink(Resource.Profile, GlobalConstants.Index , "Profile")</li>
+    <li class="active">@ViewBag.Title</li>
+</ol>
+
+<div class="container">
+    @if (Model == null)
+    {
+        <div class="alert alert-info">
+            @Resource.Not_logged_in
+        </div>
+    }
+    else
+    {
+        <h2>
+            @Resource.Settings
+        </h2>
+        using (Html.BeginForm())
+        {
+            <div class="row">
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        <strong class="text-primary">@Resource.Username</strong>
+                    </div>
+                    <div class="col-xs-7 text-white">
+                        @User.Identity.Name
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        <strong class="text-primary">@Resource.Password</strong>
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.ActionLink(Resource.Change_password, "Manage", "Account", new { area = string.Empty }, null)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        <strong class="text-primary">@Resource.Email</strong>
+                    </div>
+                    <div class="col-xs-7">
+                        <span class="text-white">
+                            @Model.Email
+                        </span>
+                        <span>
+                            @Html.ActionLink(Resource.Change_email, "ChangeEmail", "Account", new { area = string.Empty}, null)
+                        </span>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.FirstName, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.FirstName)
+                        @Html.ValidationMessageFor(m => m.FirstName)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.LastName, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.LastName)
+                        @Html.ValidationMessageFor(m => m.LastName)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.DateOfBirth, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @(Html.Kendo().DatePicker()
+                              .Name("DateOfBirth")
+                              .Start(CalendarView.Decade)
+                              .Value(Model.DateOfBirth)
+                              .HtmlAttributes(new { style = "width:175px; margin-bottom: 3px" })
+                        )
+                        @Html.ValidationMessageFor(m => m.DateOfBirth)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.City, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.City)
+                        @Html.ValidationMessageFor(m => m.City)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.EducationalInstitution, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.EducationalInstitution)
+                        @Html.ValidationMessageFor(m => m.EducationalInstitution)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.FacultyNumber, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.FacultyNumber)
+                        @Html.ValidationMessageFor(m => m.FacultyNumber)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.Company, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.Company)
+                        @Html.ValidationMessageFor(m => m.Company)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        @Html.LabelFor(m => m.JobTitle, new { @class = "text-primary loud" })
+                    </div>
+                    <div class="col-xs-7">
+                        @Html.EditorFor(m => m.JobTitle)
+                        @Html.ValidationMessageFor(m => m.JobTitle)
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-4 text-right">
+                        <a href="/Users/Profile" class="btn btn-primary">@Resource.Cancel</a>
+                    </div>
+                    <div class="col-md-7 text-left">
+                        <button class="btn btn-success" type="submit">@Resource.Save</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

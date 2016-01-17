@@ -1,0 +1,177 @@
+﻿@using Resource = Resources.Areas.Administration.Contests.Views.ContestIndex
+@using GeneralResource = Resources.Areas.Administration.AdministrationGeneral;
+@{
+    ViewBag.Title = Resource.Page_title;
+    const string ContestControllerName = "Contests";
+    const string ContestQuestionControllerName = "ContestQuestions";
+    const string ContestQuestionAnswersControllerName = "ContestQuestionAnswers";
+}
+<h1>@ViewBag.Title</h1>
+
+@(Html.Kendo().Grid<OJS.Web.Areas.Administration.ViewModels.Contest.ContestAdministrationViewModel>()
+    .Name("DataGrid")
+    .Columns(columns =>
+        {
+            columns.Bound(x => x.Id);
+            columns.Bound(x => x.Name);
+            columns.Bound(x => x.StartTime).Format("{0:dd/MM/yyyy HH:mm}");
+            columns.Bound(x => x.EndTime).Format("{0:dd/MM/yyyy HH:mm}");
+            columns.Bound(x => x.PracticeStartTime).Format("{0:dd/MM/yyyy HH:mm}");
+            columns.Bound(x => x.PracticeEndTime).Format("{0:dd/MM/yyyy HH:mm}").Hidden();
+            columns.Bound(x => x.IsVisible).Hidden();
+            columns.Bound(x => x.CreatedOn).Format("{0:dd/MM/yyyy HH:mm}").Hidden();
+            columns.Bound(x => x.ModifiedOn).Format("{0:dd/MM/yyyy HH:mm}").Hidden();
+            columns.Template(@<text></text>).ClientTemplate(string.Format("<a class='k-button' href='{0}/#=Id#?compete=true'>{1}</a><br /><a class='k-button' href='{0}/#=Id#?compete=false'>{2}</a>", Url.Action("Solutions", "ContestsExport"), Resource.For_contest, Resource.For_practice)).Title(Resource.Results).Width(200);
+            columns.Template(@<text></text>).ClientTemplate(string.Format("<a class='k-button' href='{0}/#=Id#?compete=true'>{1}</a><br /><a class='k-button' href='{0}/#=Id#?compete=false'>{2}</a>", Url.Action("Results", "ContestsExport"), Resource.For_contest, Resource.For_practice)).Title(Resource.Ranking).Width(200);
+            columns.Template(@<text></text>).ClientTemplate(string.Format("<a class='k-button' href='{0}/#=Id#'>{1}</a><br /><a class='k-button' href='{2}/#=Id#'>{3}</a>", Url.Action("Contest", "Problems"), Resource.Tasks, Url.Action("Contest", "Participants"), Resource.Participants)).Title(Resource.Other);
+            columns.Template(@<text></text>).ClientTemplate(string.Format("<a class='k-button' href='{0}/#=Id#'>{1}</a>", Url.Action("Edit", "Contests"), Resource.Edit)).Title(GeneralResource.Change);
+            columns.Command(command => command.Destroy().Text(" ")).Width(80).Title(GeneralResource.Delete);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text(GeneralResource.Create).Action("Create", ContestControllerName);
+        toolbar.Custom().Text(GeneralResource.Back_to_navigation).Action("Navigation", "Administration", new { Area = "" }).Name("custom-toolbar-button");
+        toolbar.Custom().Text(GeneralResource.Export_to_excel).Name("custom-toolbar-button").HtmlAttributes(new { id = "export" }).Url(Url.Action("ExportToExcel", ContestControllerName, new { page = 1, pageSize = "~", filter = "!!", sort = "~" }));
+    })
+    .Editable(editable =>
+    {
+        editable.Mode(GridEditMode.PopUp);
+        editable.Window(w => w.Title(ViewBag.Title));
+        editable.DisplayDeleteConfirmation(GeneralResource.Delete_prompt);
+    })
+    .ColumnMenu()
+    .ClientDetailTemplateId("questions-template")
+    .Events(e => e.DataBound("onDataBound"))
+    .Pageable(x => x.Refresh(true))
+    .Sortable(x => x.Enabled(true).AllowUnsort(false))
+    .Filterable(x => x.Enabled(true))
+    .Groupable(x =>
+    {
+        x.Enabled(true);
+        x.Messages(m => m.Empty(GeneralResource.Group_by_message));
+    })
+    .Reorderable(x => x.Columns(true))
+    .Resizable(x => x.Columns(true))
+    .DataSource(datasource => datasource
+        .Ajax()
+        .ServerOperation(true)
+        .Model(model => model.Id(x => x.Id))
+        .Sort(sort => sort.Add(x => x.CreatedOn).Descending())
+        .Create(create => create.Action("Create", ContestControllerName))
+        .Read(read => read.Action("Read", ContestControllerName))
+        .Update(update => update.Action("Update", ContestControllerName))
+        .Destroy(destroy => destroy.Action("Destroy", ContestControllerName))
+        .Events(ev => ev.Error("validateModelStateErrors"))
+    )
+)
+
+<script type="text/javascript">
+    function onDataBound() {
+        CreateExportToExcelButton();
+    }
+</script>
+
+<script type="text/x-kendo-template" id="questions-template">
+    @(Html.Kendo().Grid<OJS.Web.Areas.Administration.ViewModels.ContestQuestion.ContestQuestionViewModel>()
+        .Name("DetailQuestionsGrid_#=Id#")
+        .Columns(columns =>
+        {
+            columns.Bound(m => m.QuestionId);
+            columns.Bound(m => m.Text);
+            columns.Bound(m => m.Type).ClientTemplate("\\#= getTypeName(Type) \\#");
+            columns.Bound(m => m.RegularExpressionValidation).Hidden();
+            columns.Bound(m => m.AskPracticeParticipants);
+            columns.Bound(m => m.AskOfficialParticipants);
+            columns.Bound(m => m.CreatedOn).Hidden();
+            columns.Bound(m => m.ModifiedOn).Hidden();
+            columns.Command(com => com.Edit().Text(" ")).Width(80);
+            columns.Command(com => com.Destroy().Text(" ")).Width(80);
+        })
+        .ToolBar(tool =>
+            {
+                tool.Create().Text(Resource.Add_question);
+                tool.Custom().Text(Resource.Copy_from).HtmlAttributes(new { onclick = "copyFromContest(event, #=Id#)" });
+            })
+        .ColumnMenu()
+        .ClientDetailTemplateId("answers-template")
+        .Editable(edit =>
+            {
+                edit.Mode(GridEditMode.PopUp);
+                edit.Window(w => w.Title(ViewBag.Title));
+                edit.DisplayDeleteConfirmation(GeneralResource.Delete_prompt);
+            })
+        .DataSource(data =>
+        {
+            data.Ajax()
+                .ServerOperation(true)
+                .Model(model =>
+                {
+                    model.Id(m => m.QuestionId);
+                })
+                .Sort(sort => sort.Add(field => field.CreatedOn))
+                .Create(create => create.Action("AddQuestionToContest", ContestQuestionControllerName, new { id = "#= Id #" }))
+                .Read(read => read.Action("QuestionsInContest", ContestQuestionControllerName, new { id = "#= Id #" }))
+                .Update(update => update.Action("UpdateQuestionInContest", ContestQuestionControllerName))
+                .Destroy(destroy => destroy.Action("DeleteQuestionFromContest", ContestQuestionControllerName));
+        })
+        .ToClientTemplate())
+
+    @(Html.Kendo().Window()
+        .Name("CopyFromContestWindow_#=Id#")
+        .Title(Resource.Copy_from_contest)
+        .LoadContentFrom("/Administration/ContestQuestions/CopyFromAnotherContest/#=Id#")
+        .Visible(false)
+        .Modal(true)
+        .Width(400)
+        .Actions(actions => actions.Close())
+        .ToClientTemplate())
+</script>
+
+<script type="text/x-kendo-template" id="answers-template">
+    # if ((Type == 0) || (Type == 1)) { #
+    @(Html.Kendo().Grid<OJS.Web.Areas.Administration.ViewModels.ContestQuestionAnswer.ContestQuestionAnswerViewModel>()
+        .Name("DetailAnswerGrid_#=QuestionId#")
+        .Columns(columns =>
+        {
+            columns.Bound(m => m.AnswerId);
+            columns.Bound(m => m.Text);
+            columns.Bound(m => m.QuestionText);
+            columns.Command(com => com.Edit().Text(" ")).Width(80);
+            columns.Command(com => com.Destroy().Text(" ")).Width(80);
+        })
+        .ToolBar(tool =>
+            {
+                tool.Create().Text(Resource.Add_answer);
+                tool.Custom().Text(Resource.Delete_all).HtmlAttributes(new { id = "delete-all-answers", data_question_id = "#=QuestionId#" });
+            })
+        .ColumnMenu()
+        .Editable(edit =>
+            {
+                edit.Mode(GridEditMode.PopUp);
+                edit.Window(w => w.Title(ViewBag.Title));
+                edit.DisplayDeleteConfirmation(GeneralResource.Delete_prompt);
+            })
+        .DataSource(data =>
+        {
+            data.Ajax()
+                .ServerOperation(true)
+                .Model(model =>
+                {
+                    model.Id(m => m.QuestionId);
+                })
+                .Sort(sort => sort.Add(field => field.AnswerId))
+                .Create(create => create.Action("AddAnswerToQuestion", ContestQuestionAnswersControllerName, new { id = "#= QuestionId #" }))
+                .Read(read => read.Action("AnswersInQuestion", ContestQuestionAnswersControllerName, new { id = "#= QuestionId #" }))
+                .Update(update => update.Action("UpdateAnswerInQuestion", ContestQuestionAnswersControllerName))
+                .Destroy(destroy => destroy.Action("DeleteAnswerFromQuestion", ContestQuestionAnswersControllerName, new { id = "#= QuestionId #" }));
+        })
+        .ToClientTemplate())
+    # }
+    else { #
+    <div class="text-center">@Resource.No_possible_answers</div>
+    # } #
+</script>
+
+@section scripts {
+    <script src="~/Scripts/Administration/Contests/contests-index.js"></script>
+}

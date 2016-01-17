@@ -1,0 +1,62 @@
+﻿@using Resource = Resources.Areas.Administration.Submissions.Views.SubmissionsIndex;
+@{
+    ViewBag.Title = Resource.Page_title;
+}
+
+<h1>@ViewBag.Title</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            @(Html
+            .Kendo()
+            .ComboBox()
+            .Name("contests")
+            .DataTextField("Name")
+            .DataValueField("Id")
+            .Filter(FilterType.Contains)
+            .AutoBind(false)
+            .MinLength(3)
+            .Placeholder(Resource.Choose_or_enter_contest)
+            .Events(ev => ev.Change("selectContest"))
+            .DataSource(dataSource =>
+                {
+                    dataSource
+                        .Read(read =>
+                            {
+                                read.Action("Contests", "Submissions")
+                                    .Data("additionalComboBoxData");
+                            })
+                        .ServerFiltering(true);
+                })
+            .HtmlAttributes(new { style = "width: 100%;" }))
+        </div>
+        <div class="col-md-2 text-right">
+            @Ajax.ActionLink(Resource.Clear, "RenderGrid", null, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "submissions-grid" }, new { @class = "btn btn-primary btn-sm" })
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12" id="submissions-grid">
+            @Html.Partial("_SubmissionsGrid")
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        function additionalComboBoxData() {
+            return {
+                text: $("#contests").data("kendoComboBox").input.val()
+            }
+        }
+
+        function selectContest() {
+            var contestId = $("#contests").val();
+
+            $.post('/Administration/Submissions/RenderGrid/' + contestId, function (data) {
+                $("#submissions-grid").html(data);
+            });
+        }
+    </script>
+}

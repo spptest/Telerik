@@ -1,0 +1,7 @@
+﻿@model int
+
+@(Html.Kendo()
+    .DropDownListFor(m => m)
+    .BindTo((IEnumerable<SelectListItem>)ViewData[ViewData.TemplateInfo.GetFullHtmlFieldName("") + "Data"])
+    .OptionLabel("Изберете категория")
+    .HtmlAttributes(new { style = "width: 100%;" }))

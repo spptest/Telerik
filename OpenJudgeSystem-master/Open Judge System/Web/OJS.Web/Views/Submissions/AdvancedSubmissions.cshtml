@@ -1,0 +1,18 @@
+﻿@using Resource = Resources.Submissions.Views.AdvancedSubmissions;
+@model OJS.Web.ViewModels.Submission.SubmissionViewModel
+
+@{
+    ViewBag.Title = Resource.Page_title;
+}
+<script src="/Scripts/Helpers/test-results.js"></script>
+
+<ol class="breadcrumb">
+    <li><a href="/">Начало</a></li>
+    <li class="active">Решения</li>
+</ol>
+
+<h1>@ViewBag.Title</h1>
+
+@{
+    Html.RenderPartial("_AdvancedSubmissionsGridPartial");
+}

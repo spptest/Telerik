@@ -1,0 +1,203 @@
+﻿@using Resource = Resources.Areas.Administration.Contests.Views.Partials.ContestEditor;
+@model OJS.Web.Areas.Administration.ViewModels.Contest.ContestAdministrationViewModel
+
+<div class="row">
+    <div class="editor-label col-xs-3">
+        @Html.ValidationMessageFor(m => m.SelectedSubmissionTypes)
+    </div>
+</div>
+<fieldset>
+    <legend>@Resource.General_info</legend>
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.Name)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.Name, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_title" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.Name)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.CategoryId)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.CategoryId, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Choose_category" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.CategoryId)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.Description)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.Description, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Enter_description" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.Description)
+        </div>
+    </div>
+    <br />
+</fieldset>
+<fieldset>
+    <legend>@Resource.Duration_info</legend>
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.StartTime)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.StartTime, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Contest_start" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.StartTime)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.EndTime)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.EndTime, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Contest_end" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.EndTime)
+        </div>
+    </div>
+    <br /><div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.PracticeStartTime)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.PracticeStartTime, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Practice_start" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.PracticeStartTime)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.PracticeEndTime)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.PracticeEndTime, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Practice_end" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.PracticeEndTime)
+        </div>
+    </div>
+    <br />
+</fieldset>
+<fieldset>
+    <legend>@Resource.Passowords_info</legend>
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.ContestPassword)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.ContestPassword, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Contest_password" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.ContestPassword)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.PracticePassword)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.PracticePassword, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Practice_password" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.PracticePassword)
+        </div>
+    </div>
+    <br />
+</fieldset>
+<fieldset>
+    <legend>@Resource.Options</legend>
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.LimitBetweenSubmissions)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.LimitBetweenSubmissions, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Submissions_limit" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.LimitBetweenSubmissions)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.OrderBy)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.OrderBy, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Contest_order" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.OrderBy)
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="editor-label col-xs-3">
+            <div class="pull-right">
+                @Html.LabelFor(m => m.IsVisible)
+            </div>
+        </div>
+        <div class="editor-field col-xs-4">
+            @Html.EditorFor(m => m.IsVisible, new { @class = "form-control pull-left full-editor" })
+        </div>
+        <div class="editor-field col-xs-4">
+            <span class="glyphicon glyphicon-question-sign text-primary" title="@Resource.Contest_visibility" data-tooltip="true"></span>
+            @Html.ValidationMessageFor(m => m.IsVisible)
+        </div>
+    </div>
+    <br />
+</fieldset>
+<fieldset>
+    <legend>@Resource.Submission_types</legend>
+    @Html.EditorFor(m => m.SubmisstionTypes)
+</fieldset>

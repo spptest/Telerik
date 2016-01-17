@@ -1,0 +1,61 @@
+﻿@model OJS.Web.ViewModels.Feedback.FeedbackViewModel
+@using Resource = Resources.Feedback.Views.FeedbackIndex
+
+@{
+    ViewBag.Title = Resource.Title;
+}
+<ol class="breadcrumb">
+    <li><a href="/">@Resource.Home</a></li>
+    <li class="active">@ViewBag.Title</li>
+</ol>
+
+<h1>@ViewBag.Title</h1>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-5">
+            <div class="editor-label">
+                @Html.LabelFor(m => m.Name)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(m => m.Name)
+                @Html.ValidationMessageFor(m => m.Name)
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-5">
+            <div class="editor-label">
+                @Html.LabelFor(m => m.Email, "Email")
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(m => m.Email)
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-5">
+            <div class="editor-label">
+                @Html.LabelFor(m => m.Content)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(m => m.Content)
+                @Html.ValidationMessageFor(m => m.Content)
+            </div>
+            <div class="captcha-container editor-field small-margin-top">
+                <br />
+                @Html.Raw(@Html.GenerateCaptcha())
+                @Html.ValidationMessage("Captcha")
+            </div>
+        </div>
+    </div>
+    <br />
+    <button class="btn btn-primary" type="submit">@Resource.Submit</button>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

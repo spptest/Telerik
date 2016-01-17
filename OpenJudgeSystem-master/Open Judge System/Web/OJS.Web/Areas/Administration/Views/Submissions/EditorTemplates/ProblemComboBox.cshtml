@@ -1,0 +1,20 @@
+﻿@using Resource = Resources.Areas.Administration.Submissions.Views.EditorTemplates.SubmissionsEditorTemplates;
+@model int?
+
+@(Html.Kendo()
+    .ComboBoxFor(m => m)
+    .Name("ProblemId")
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .Filter(FilterType.Contains)
+    .MinLength(1)
+    .Placeholder(Resource.Choose_problem)
+    .DataSource(data =>
+    {
+        data.ServerFiltering(true)
+            .Read(read =>
+            {
+                read.Action("GetProblems", "Submissions");
+            });
+    })
+    .HtmlAttributes(new { style = "width: 100%;" }))

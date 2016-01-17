@@ -1,0 +1,17 @@
+﻿@model OJS.Web.Areas.Users.ViewModels.UserProfileViewModel
+@using Resource = Resources.Areas.Users.Views.Profile.ProfileIndex
+
+@{
+    ViewBag.Title = string.Format(Resource.Title, Model.Username);
+}
+
+<script src="/Scripts/Helpers/test-results.js"></script>
+
+<ol class="breadcrumb">
+    <li><a href="/">@Resource.Home</a></li>
+    <li class="active">@Resource.Profile</li>
+</ol>
+
+<div class="row">
+    @Html.Partial("_ProfileInfo", Model)
+</div>

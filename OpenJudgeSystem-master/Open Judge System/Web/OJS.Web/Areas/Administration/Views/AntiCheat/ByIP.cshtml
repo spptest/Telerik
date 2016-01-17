@@ -1,0 +1,32 @@
+﻿@using Resource = Resources.Areas.Administration.AntiCheat.Views.AntiCheatViews;
+@model IEnumerable<SelectListItem>
+@{
+    ViewBag.Title = Resource.By_ip_page_title;
+}
+
+<h1>@ViewBag.Title</h1>
+<div class="row">
+    <div class="col-md-9">
+        @Html.Partial("_ContestsComboBox", Model)
+    </div>
+    <div class="col-md-3">
+        <input id="exclude-ips" type="text" class="form-control" />
+    </div>
+</div>
+
+<br />
+<div id="ip-grid">
+</div>
+
+@section scripts{
+    <script>
+        function selectContest() {
+            var contestId = $('#contests').val();
+            var excludeIps = $('#exclude-ips').val();
+
+            $.get('/Administration/AntiCheat/RenderByIpGrid/' + contestId + '?excludeIps=' + excludeIps, function (data) {
+                $("#ip-grid").html(data);
+            });
+        }
+    </script>
+}

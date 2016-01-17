@@ -1,0 +1,62 @@
+﻿.problem_submit_grid .k-grid-top {
+    line-height: 25px;
+    text-align: center;
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+    .row .k-widget * {
+        -webkit-box-sizing: border-box !important;
+        -moz-box-sizing: border-box !important;
+        box-sizing: border-box !important;
+    }
+
+.resource-glyph {
+    margin-right: 5px;
+    padding-left: 5px;
+}
+
+.resource-link {
+    padding-right: 5px;
+    border-right: 1px solid grey;
+}
+
+.materials {
+    margin-bottom: 10px;
+}
+
+.alert {
+    padding: 10px;
+}
+
+.countdown-warning {
+    color: rgb(204, 21, 21) !important;
+}
+
+#countdown-timer {
+    display: none;
+}
+
+.submit-container {
+    margin: 6px;
+}
+
+.submision-submit-button {
+    padding-top: 0;
+    padding-bottom: 1px;
+}
+
+.view-submission-button {
+    padding: 5px;
+    margin: 0 5px;
+}
+
+.problem-result-container .k-grid td {
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}

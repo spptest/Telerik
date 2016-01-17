@@ -1,0 +1,41 @@
+﻿@model OJS.Web.Areas.Contests.ViewModels.Contests.ContestRegistrationViewModel
+
+@using Resource = Resources.Areas.Contests.Views.CompeteRegister
+
+@{
+    ViewBag.Title = Model.ContestName;
+}
+<div class="row">
+    <div class="col-md-12">
+        <h1>@ViewBag.Title</h1>
+    </div>
+</div>
+
+<div class="row text-white">
+    <div class="col-md-4">
+        @using (Html.BeginForm())
+        {
+            @Html.HiddenFor(x => x.ContestId)
+            if (Model.RequirePassword)
+            {
+                <div class="form-group">
+                    <div class="editor-field">
+                        <div class="editor-label">
+                            @Html.LabelFor(x => x.Password)
+                        </div>
+                        @Html.PasswordFor(x => x.Password, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.Password)
+                    </div>
+                </div>
+            }
+
+            @Html.EditorFor(x => x.Questions)
+            @Html.ValidationMessage("Questions")
+            <input type="submit" value="@Resource.Submit" class="btn btn-default" />
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

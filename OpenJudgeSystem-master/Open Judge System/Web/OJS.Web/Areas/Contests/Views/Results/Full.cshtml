@@ -1,0 +1,92 @@
+﻿@model OJS.Web.Areas.Contests.ViewModels.Results.ContestFullResultsViewModel
+
+@using OJS.Common.Models
+@using Resource = Resources.Areas.Contests.Views.ResultsFull
+@using OJS.Web.Areas.Contests.Controllers
+
+@{
+    ViewBag.Title = string.Format(Resource.Title, Model.Name);
+    ViewBag.Subtitle = string.Format(Resource.Subtitle, Model.Results.Count());
+}
+
+<ol class="breadcrumb">
+    <li><a href="/">@Resource.Home</a></li>
+    <li><a href="@ContestsHelper.GetUrl(Model.Id, Model.Name)">@Model.Name</a></li>
+    <li class="active">@Resource.Full_results</li>
+</ol>
+
+<h1>@ViewBag.Title</h1>
+<h2>
+    @ViewBag.Subtitle
+    <span>@Html.ActionLink(Resource.Public_results, "Simple", new { id = Model.Id, official = ViewBag.IsOfficial }, new { @class = "btn btn-primary" })</span>
+</h2>
+
+@{Html.RenderAction("Stats", new { viewModel = Model });}
+
+@if (ViewBag.IsOfficial)
+{
+    <h4>@Ajax.ActionLink(Resource.Average_result_by_minutes, "StatsChart", new { contestId = Model.Id }, new AjaxOptions { UpdateTargetId = "StatsChartContainer", InsertionMode = InsertionMode.Replace })</h4>
+    <div id="StatsChartContainer"></div>
+}
+
+<br />
+
+<script src="/Scripts/Helpers/test-results.js"></script>
+<table class="table table-striped">
+    <tr>
+        <th>No</th>
+        <th>@Resource.User</th>
+        <th>@Resource.UserFullName</th>
+        @{
+            string isOfficial = ViewBag.IsOfficial ? CompeteController.CompeteUrl : CompeteController.PracticeUrl;
+            int problemNumber = 0;
+        }
+        @foreach (var problem in Model.Problems)
+        {
+            <th><a href="/Contests/@isOfficial/Index/@Model.Id#@problemNumber">@problem.Name</a></th>
+            problemNumber++;
+        }
+        <th>@Resource.Total</th>
+    </tr>
+    @{ var count = 1; }
+    @foreach (var participant in Model.Results)
+    {
+        <tr>
+            <td><strong>@count.</strong></td>
+            <th><a href="/Users/@participant.ParticipantUsername">@participant.ParticipantUsername</a></th>
+            <td>@participant.ParticipantFullName</td>
+            @foreach (var problemResult in participant.ProblemResults)
+            {
+                <td style="white-space: nowrap">
+                    @if (problemResult.BestSubmission == null)
+                    {
+                        <span>@Resource.No_solution</span>
+                    }
+                    else
+                    {
+                        <strong><a href="/Contests/Submissions/View/@problemResult.BestSubmission.Id">@problemResult.BestSubmission.Points / @problemResult.MaximumPoints</a></strong> @problemResult.BestSubmission.SubmissionType
+                        <br />
+                        if (!problemResult.BestSubmission.IsCompiledSuccessfully)
+                        {
+                            @:Compilation failed!
+                        }
+                        foreach (var testRun in problemResult.BestSubmission.TestRuns)
+                        {
+                            var style = testRun.IsZeroTest ? "-ms-opacity: 0.3; opacity: 0.3" : string.Empty;
+                            switch (testRun.ResultType)
+                            {
+                                case TestRunResultType.CorrectAnswer:<span style="@style" class="glyphicon glyphicon-ok text-success" title=@Resource.Answer_correct></span>break;
+                                case TestRunResultType.WrongAnswer:<span style="@style" class="glyphicon glyphicon-remove text-danger" title=@Resource.Answer_incorrect></span>break;
+                                case TestRunResultType.TimeLimit:<span style="@style" class="glyphicon glyphicon-time text-danger" title=@Resource.Time_limit></span>break;
+                                case TestRunResultType.MemoryLimit:<span style="@style" class="glyphicon glyphicon-hdd text-danger" title=@Resource.Memory_limit></span>break;
+                                case TestRunResultType.RunTimeError:<span style="@style" class="glyphicon glyphicon-asterisk text-danger" title=@Resource.Runtime_error></span>break;
+                            }
+                        }
+                    }
+                </td>
+            }
+            <td>@participant.Total</td>
+        </tr>
+        { count++; }
+    }
+</table>

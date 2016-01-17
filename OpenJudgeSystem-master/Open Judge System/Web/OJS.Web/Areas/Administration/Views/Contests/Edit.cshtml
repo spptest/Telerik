@@ -1,0 +1,28 @@
+﻿@using Resource = Resources.Areas.Administration.Contests.Views.ContestEdit
+@model OJS.Web.Areas.Administration.ViewModels.Contest.ContestAdministrationViewModel
+@{
+    ViewBag.Title = Resource.Page_title;
+}
+
+<h2>@ViewBag.Title @Model.Name</h2>
+<div id="create-form" class="container">
+    @using (Html.BeginForm("Edit", "Contests", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.CreatedOn)
+        @Html.ValidationMessage(GlobalConstants.DateTimeError)
+
+        @Html.Partial("_ContestEditor", Model)
+        <hr />
+        <div class="row">
+            <div class="editor-label col-xs-3">
+                <button type="submit" class="btn btn-primary pull-right">@Resource.Edit</button>
+            </div>
+            <div class="editor-label col-xs-4">
+                <a href="/Administration/Contests/" class="btn btn-primary">@Resource.Back</a>
+            </div>
+        </div>
+    }
+</div>
+
+@(Html.Kendo().Tooltip().For("#create-form").Filter("[data-tooltip='true']").Position(TooltipPosition.Bottom).Width(240))

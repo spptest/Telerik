@@ -1,0 +1,63 @@
+﻿@using Resource = Resources.Areas.Administration.ContestCategories.Views.ContestCategoriesViews;
+@using GeneralResource = Resources.Areas.Administration.AdministrationGeneral;
+@{
+    ViewBag.Title = Resource.Index_page_title;
+    const string ControllerName = "ContestCategories";
+}
+<h1>@ViewBag.Title</h1>
+
+@(Html.Kendo().Grid<OJS.Web.Areas.Administration.ViewModels.ContestCategory.ContestCategoryAdministrationViewModel>()
+    .Name("DataGrid")
+    .Columns(columns =>
+    {
+        columns.Bound(x => x.Id);
+        columns.Bound(x => x.Name);
+        columns.Bound(x => x.IsVisible);
+        columns.Bound(x => x.OrderBy);
+        columns.Bound(x => x.CreatedOn).Format("{0:dd/MM/yyyy HH:mm}").Hidden();
+        columns.Bound(x => x.ModifiedOn).Format("{0:dd/MM/yyyy HH:mm}").Hidden();
+        columns.Command(command => command.Edit().Text(" ").UpdateText(GeneralResource.Change).CancelText(GeneralResource.Cancel)).Width(80).Title(GeneralResource.Change);
+        columns.Command(command => command.Destroy().Text(" ")).Width(80).Title(GeneralResource.Delete);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Create().Text(GeneralResource.Create);
+        toolbar.Custom().Text(GeneralResource.Back_to_navigation).Action("Navigation", "Administration", new { Area = "" }).Name("custom-toolbar-button");
+        toolbar.Custom().Text(GeneralResource.Export_to_excel).Name("custom-toolbar-button").HtmlAttributes(new { id = "export" }).Url(Url.Action("ExportToExcel", ControllerName, new { page = 1, pageSize = "~", filter = "!!", sort = "~" }));
+    })
+    .Editable(editable =>
+    {
+        editable.Mode(GridEditMode.PopUp);
+        editable.Window(w => w.Title(ViewBag.Title));
+        editable.DisplayDeleteConfirmation(Resource.Delete_prompt);
+    })
+    .ColumnMenu()
+    .Events(e => e.DataBound("onDataBound"))
+    .Pageable(x => x.Refresh(true))
+    .Sortable(x => x.Enabled(true).AllowUnsort(false))
+    .Filterable(x => x.Enabled(true))
+    .Groupable(x =>
+    {
+        x.Enabled(true);
+        x.Messages(m => m.Empty(GeneralResource.Group_by_message));
+    })
+    .Reorderable(x => x.Columns(true))
+    .Resizable(x => x.Columns(true))
+    .DataSource(datasource => datasource
+        .Ajax()
+        .ServerOperation(true)
+        .Model(model => model.Id(x => x.Id))
+        .Sort(sort => sort.Add(x => x.CreatedOn).Descending())
+        .Create(create => create.Action("Create", ControllerName))
+        .Read(read => read.Action("Read", ControllerName))
+        .Update(update => update.Action("Update", ControllerName))
+        .Destroy(destroy => destroy.Action("Destroy", ControllerName))
+        .Events(ev => ev.Error("validateModelStateErrors"))
+    )
+)
+
+<script type="text/javascript">
+    function onDataBound(e) {
+        CreateExportToExcelButton();
+    }
+</script>

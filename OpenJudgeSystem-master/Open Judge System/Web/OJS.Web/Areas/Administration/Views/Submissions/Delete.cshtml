@@ -1,0 +1,55 @@
+﻿@using Resource = Resources.Areas.Administration.Submissions.Views.SubmissionsDelete; 
+@model OJS.Web.Areas.Administration.ViewModels.Submission.SubmissionAdministrationGridViewModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.Page_title, Model.ParticipantName);
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="container">
+    <div class="editor-label">
+        @Html.LabelFor(m => m.ProblemName)
+    </div>
+    <div class="panel-body news-content editor-field">
+        @Model.ProblemName
+    </div>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(m => m.ParticipantName)
+    </div>
+    <div class="panel-body news-content editor-field">
+        @Model.ParticipantName
+    </div>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(m => m.SubmissionTypeName)
+    </div>
+    <div class="panel-body news-content editor-field">
+        @Model.SubmissionTypeName
+    </div>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(m => m.Points)
+    </div>
+    <div class="panel-body news-content editor-field">
+        @Model.Points
+    </div>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(m => m.Status)
+    </div>
+    <div class="panel-body news-content editor-field">
+        @Model.Status
+    </div>
+    <br />
+</div>
+
+<div class="row">
+    <div class="editor-label col-xs-1">
+        @Html.ActionLink(Resource.Delete, "ConfirmDelete", new { id = Model.Id }, new { @class = "btn btn-primary" })
+    </div>
+    <div class="editor-label col-xs-1">
+        @Html.ActionLink(Resource.Back, GlobalConstants.Index, null, new { @class = "btn btn-primary" })
+    </div>
+</div>
